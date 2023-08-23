@@ -1,0 +1,6 @@
+/home/nherbaut/workspace/java-runner-analytics/java-code-runner/java-code-runner-model/src/main/java/fr/pantheonsorbonne/ufr27/miage/model/MinimalStackTraceElement.java
+/home/nherbaut/workspace/java-runner-analytics/java-code-runner/java-code-runner-model/src/main/java/fr/pantheonsorbonne/ufr27/miage/model/SourceFile.java
+/home/nherbaut/workspace/java-runner-analytics/java-code-runner/java-code-runner-model/src/main/java/fr/pantheonsorbonne/ufr27/miage/model/PayloadModel.java
+/home/nherbaut/workspace/java-runner-analytics/java-code-runner/java-code-runner-model/src/main/java/fr/pantheonsorbonne/ufr27/miage/model/Result.java
+/home/nherbaut/workspace/java-runner-analytics/java-code-runner/java-code-runner-model/src/main/java/fr/pantheonsorbonne/ufr27/miage/model/RuntimeError.java
+/home/nherbaut/workspace/java-runner-analytics/java-code-runner/java-code-runner-model/src/main/java/fr/pantheonsorbonne/ufr27/miage/model/MyDiagnostic.java
