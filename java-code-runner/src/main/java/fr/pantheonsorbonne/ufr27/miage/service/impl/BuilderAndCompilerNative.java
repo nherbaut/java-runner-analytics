@@ -31,67 +31,75 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
     public Result buildAndCompile(PayloadModel model) throws IOException {
         Result res = new Result();
         Path tmpDir = Files.createTempDirectory("java-runner");
-        List<File> files = generateFiles(model, tmpDir);
-
-        MethodDeclaration methodDeclaration = null;
         try {
-            methodDeclaration = findAMainMethod(model);
-        } catch (ParseProblemException e) {
-            //can't parse the Javafile, it means we let the compiler report the errors
-        }
+            List<File> files = generateFiles(model, tmpDir);
 
-        //System.out.println(String.format("I will run the method %s of class %s", methodDeclaration.getNameAsString(), methodDeclaration.findAncestor(TypeDeclaration.class).get().getName()));
-
-
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.FRENCH, StandardCharsets.UTF_8);
-        fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(tmpDir.toFile()));
-
-        Iterable<? extends JavaFileObject> compilationUnits1 =
-                fileManager.getJavaFileObjectsFromFiles(files);
-        JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, diagnostics, Lists.newArrayList("-g"), null, compilationUnits1);
-        if (compilationTask.call()) {
-
-            ClassLoader urlClassLoader = new URLClassLoader("java-runner", new URL[]{tmpDir.toUri().toURL()}, this.getClass().getClassLoader());
-
+            MethodDeclaration methodDeclaration = null;
             try {
+                methodDeclaration = findAMainMethod(model);
+            } catch (ParseProblemException e) {
+                //can't parse the Javafile, it means we let the compiler report the errors
+            }
+
+            //System.out.println(String.format("I will run the method %s of class %s", methodDeclaration.getNameAsString(), methodDeclaration.findAncestor(TypeDeclaration.class).get().getName()));
 
 
-                Method method = getMainMethodFromMethodDeclaration(methodDeclaration, urlClassLoader);
-                Future<?> execution = executorService.submit(() -> {
-                    try {
-                        invokeMethod(res, method);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+            StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.FRENCH, StandardCharsets.UTF_8);
+            fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(tmpDir.toFile()));
+
+            Iterable<? extends JavaFileObject> compilationUnits1 =
+                    fileManager.getJavaFileObjectsFromFiles(files);
+            JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, diagnostics, Lists.newArrayList("-g"), null, compilationUnits1);
+            if (compilationTask.call()) {
+
+                ClassLoader urlClassLoader = new URLClassLoader("java-runner", new URL[]{tmpDir.toUri().toURL()}, this.getClass().getClassLoader());
 
                 try {
-                    execution.get(10, TimeUnit.SECONDS);
-                } catch (ExecutionException | InterruptedException | TimeoutException ie) {
-                    res.getRuntimeError().add(new RuntimeError("Your code timed out"));
-                    execution.cancel(true);
+
+
+                    Method method = getMainMethodFromMethodDeclaration(methodDeclaration, urlClassLoader);
+                    Future<?> execution = executorService.submit(() -> {
+                        try {
+                            invokeMethod(res, method);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+                    try {
+                        execution.get(10, TimeUnit.SECONDS);
+                    } catch (ExecutionException | InterruptedException | TimeoutException ie) {
+                        res.getRuntimeError().add(new RuntimeError("Your code timed out"));
+                        execution.cancel(true);
+                    }
+
+
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
 
 
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
             }
 
 
+            diagnostics.getDiagnostics().
+
+                    forEach((diagnostic) ->
+
+                            res.getCompilationDiagnostic().add(MyDiagnostic.fromDiagnosis(diagnostic)));
+
+
+            fileManager.close();
+            return res;
+        }finally {
+            //stolen from https://www.baeldung.com/java-delete-directory
+            Files.walk(tmpDir)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
         }
-
-
-        diagnostics.getDiagnostics().
-
-                forEach((diagnostic) ->
-
-                        res.getCompilationDiagnostic().add(MyDiagnostic.fromDiagnosis(diagnostic)));
-
-
-        fileManager.close();
-        return res;
     }
 
     @Override
