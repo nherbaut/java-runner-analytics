@@ -28,7 +28,7 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
 
 
     @Override
-    public Result buildAndCompile(PayloadModel model) throws IOException {
+    public Result buildAndCompile(PayloadModel model,long delay, TimeUnit timeUnit) throws IOException {
         Result res = new Result();
         Path tmpDir = Files.createTempDirectory("java-runner");
         try {
@@ -69,9 +69,15 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
                     });
 
                     try {
-                        execution.get(10, TimeUnit.SECONDS);
-                    } catch (ExecutionException | InterruptedException | TimeoutException ie) {
+                        execution.get(delay,timeUnit);
+                    } catch (TimeoutException ie) {
                         res.getRuntimeError().add(new RuntimeError("Your code timed out"));
+
+
+                    } catch (ExecutionException | InterruptedException e) {
+                        putErrorInTheResult(res,e);
+                    }
+                    finally {
                         execution.cancel(true);
                     }
 
@@ -148,11 +154,9 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
             try {
                 method.invoke(null, new Object[]{new String[0]});
             } catch (Throwable t) {
-                var runTimeError = new RuntimeError(t.getCause().getMessage());
-                res.getRuntimeError().add(runTimeError);
-
-
-                Arrays.stream(t.getCause().getStackTrace()).filter(ste -> "java-runner".equals(ste.getClassLoaderName())).forEach(ste -> runTimeError.getStackTraceElements().add(new MinimalStackTraceElement(ste.getClassName(), ste.getMethodName(), ste.getLineNumber())));
+                //if an error happens in the code, it will be wrapped in a cause
+                //if an error happens with our stuff, there will be no cause, so pass the throwable directlymake
+                putErrorInTheResult(res, t.getCause()!=null ? t.getCause() : t);
             }
             out1.flush();
             err1.flush();
@@ -162,6 +166,14 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
 
         }
 
+    }
+
+    private static void putErrorInTheResult(Result res, Throwable t) {
+        var runTimeError = new RuntimeError(t.getMessage());
+        res.getRuntimeError().add(runTimeError);
+
+
+        Arrays.stream(t.getStackTrace()).filter(ste -> "java-runner".equals(ste.getClassLoaderName())).forEach(ste -> runTimeError.getStackTraceElements().add(new MinimalStackTraceElement(ste.getClassName(), ste.getMethodName(), ste.getLineNumber())));
     }
 
     private static void closeIfNotNull(Closeable... closeables) {

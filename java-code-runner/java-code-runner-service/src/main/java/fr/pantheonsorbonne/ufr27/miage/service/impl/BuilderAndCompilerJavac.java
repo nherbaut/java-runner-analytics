@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Alternative
@@ -44,7 +45,7 @@ public class BuilderAndCompilerJavac extends BuilderAndCompilerAdapter {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
     @Override
-    public Result buildAndCompile(PayloadModel model) {
+    public Result buildAndCompile(PayloadModel model, long delay, TimeUnit timeUnit) {
         try {
             Result result = new Result();
             Path tmpDir = Files.createTempDirectory("java-runner");

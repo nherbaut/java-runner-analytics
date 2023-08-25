@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,7 +47,7 @@ public class RunnerResourceTest {
         var result = new Result();
         result.getStdout().add("salut\n");
 
-        assertEquals(result, builderAndCompiler.buildAndCompile(model));
+        assertEquals(result, builderAndCompiler.buildAndCompile(model,10, TimeUnit.SECONDS));
 
 
     }
@@ -63,7 +64,7 @@ public class RunnerResourceTest {
                 "    }"));
         var result = new Result();
         result.getRuntimeError().add(new RuntimeError("Your code timed out", Collections.EMPTY_LIST));
-        assertEquals(result, builderAndCompiler.buildAndCompile(model));
+        assertEquals(result, builderAndCompiler.buildAndCompile(model,5, TimeUnit.SECONDS));
 
     }
 
@@ -79,7 +80,7 @@ public class RunnerResourceTest {
                 "    }"));
         ObjectMapper mapper = new ObjectMapper();
         Result result = mapper.readValue("{\"stdout\":[],\"runtimeError\":[],\"compilationDiagnostic\":[{\"source\":\"Toto.java\",\"messageEN\":\"'{' expected\",\"code\":\"compiler.err.expected\",\"position\":16,\"startPosition\":16,\"endPosition\":16,\"lineNumber\":1,\"columnNumber\":17,\"messageFR\":\"'{' expected\",\"kind\":\"ERROR\"}]}", Result.class);
-        assertEquals(result, builderAndCompiler.buildAndCompile(model));
+        assertEquals(result, builderAndCompiler.buildAndCompile(model,10, TimeUnit.SECONDS));
 
     }
 

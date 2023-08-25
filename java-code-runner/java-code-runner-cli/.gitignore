@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+<<<<<<<< HEAD:java-code-runner/java-code-runner-cli/.gitignore
 #Maven
 ../target/
 pom.xml.tag
@@ -6,35 +8,23 @@ pom.xml.versionsBackup
 release.properties
 .flattened-pom.xml
 
+========
+>>>>>>>> 5dc7f83 (java-code-runner with submodules):java-code-runner/.gitignore
+=======
+>>>>>>> 5dc7f83 (java-code-runner with submodules)
 # Eclipse
-.project
 .classpath
+.project
 .settings/
-bin/
-
-# IntelliJ
-.idea
-*.ipr
+ 
+# Intellij
+.idea/
 *.iml
 *.iws
-
-# NetBeans
-nb-configuration.xml
-
-# Visual Studio Code
-.vscode
-.factorypath
-
-# OSX
+ 
+# Mac
 .DS_Store
-
-# Vim
-*.swp
-*.swo
-
-# patch
-*.orig
-*.rej
-
-# Local environment
-.env
+ 
+# Maven
+log/
+target/

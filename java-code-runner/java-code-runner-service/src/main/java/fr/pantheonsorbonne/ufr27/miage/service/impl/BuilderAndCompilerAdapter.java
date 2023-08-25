@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BuilderAndCompilerAdapter implements BuilderAndCompiler {
 
@@ -31,7 +32,7 @@ public class BuilderAndCompilerAdapter implements BuilderAndCompiler {
     }
 
     @Override
-    public Result buildAndCompile(PayloadModel model) throws IOException {
+    public Result buildAndCompile(PayloadModel model, long delay, TimeUnit timeUnit) throws IOException {
         return new Result();
     }
 

@@ -6,6 +6,9 @@ import java.util.Collection;
 public class PayloadModel {
     Collection<SourceFile> sources=new ArrayList<>();
 
+    public PayloadModel() {
+    }
+
     public Collection<SourceFile> getSources() {
         return sources;
     }

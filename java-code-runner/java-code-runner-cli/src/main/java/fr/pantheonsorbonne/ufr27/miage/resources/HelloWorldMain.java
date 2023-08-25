@@ -10,9 +10,10 @@ import jakarta.inject.Inject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.util.concurrent.TimeUnit;
 
 @QuarkusMain
-public class HelloWorldMain implements QuarkusApplication {
+public class JavaCodeRunnerMain implements QuarkusApplication {
 
     @Inject
     BuilderAndCompiler builderAndCompiler;
@@ -23,7 +24,7 @@ public class HelloWorldMain implements QuarkusApplication {
         BufferedInputStream bis = new BufferedInputStream(System.in);
         BufferedOutputStream bos = new BufferedOutputStream(System.out);
         PayloadModel payloadModel = mapper.readValue(bis, PayloadModel.class);
-        Result result = builderAndCompiler.buildAndCompile(payloadModel);
+        Result result = builderAndCompiler.buildAndCompile(payloadModel,10, TimeUnit.SECONDS);
 
         mapper.writeValue(bos, result);
         return 0;

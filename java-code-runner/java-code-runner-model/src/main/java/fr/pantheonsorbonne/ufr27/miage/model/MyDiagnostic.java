@@ -142,4 +142,12 @@ public class MyDiagnostic {
     public int hashCode() {
         return Objects.hash(getSource(), getMessageEN(), getCode(), getPosition(), getStartPosition(), getEndPosition(), getLineNumber(), getColumnNumber(), getMessageFR(), getKind());
     }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
 }

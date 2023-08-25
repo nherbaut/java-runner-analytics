@@ -16,8 +16,7 @@ WORKDIR /home/app
 
 RUN apk add openjdk17-jdk curl
 
-RUN curl https://maven.miage.dev/snapshots/fr/pantheonsorbonne/ufr27/miage/java-code-runner/0.0.1-SNAPSHOT/java-code-runner-0.0.1-20230823.100813-3-runner.jar  -o runner.jar
-
+COPY runner.jar /home/app/runner.jar
 USER app
 
 # Populate example here - i.e. "cat", "sha512sum" or "node index.js"

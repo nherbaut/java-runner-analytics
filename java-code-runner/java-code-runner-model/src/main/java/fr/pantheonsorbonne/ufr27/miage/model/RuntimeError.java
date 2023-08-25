@@ -7,6 +7,14 @@ import java.util.Objects;
 
 public class RuntimeError {
     String message;
+
+    public RuntimeError() {
+    }
+
+    public void setStackTraceElements(List<MinimalStackTraceElement> stackTraceElements) {
+        this.stackTraceElements = stackTraceElements;
+    }
+
     List<MinimalStackTraceElement> stackTraceElements=new ArrayList<>();
 
     public RuntimeError(String message) {

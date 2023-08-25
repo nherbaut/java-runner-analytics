@@ -7,6 +7,9 @@ import java.util.Objects;
 public class Result {
     List<String> stdout = new ArrayList<>();
 
+    public Result() {
+    }
+
 
     public List<RuntimeError> getRuntimeError() {
         return runtimeError;
@@ -51,5 +54,13 @@ public class Result {
                 ", runtimeError=" + runtimeError +
                 ", compilationDiagnostic=" + compilationDiagnostic +
                 '}';
+    }
+
+    public void setRuntimeError(List<RuntimeError> runtimeError) {
+        this.runtimeError = runtimeError;
+    }
+
+    public void setCompilationDiagnostic(List<MyDiagnostic> compilationDiagnostic) {
+        this.compilationDiagnostic = compilationDiagnostic;
     }
 }
