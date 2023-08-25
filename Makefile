@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 
 clean:
-	rm -f java-build-run/runner.jar
+	rm -f functions/java-build-run/runner.jar
 all: clean
-	sh run_all.sh
+	cd scripts && sh run_all.sh
