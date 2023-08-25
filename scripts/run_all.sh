@@ -22,7 +22,7 @@ echo "bulding the image"
 cd ./functions
 faas-cli build -f java-build-run.yml  
 echo "pushing the image to the docker hub"
-faas-cli push -f .java-build-run.yml 
+faas-cli push -f java-build-run.yml 
 echo "pushing the function to openfaas"
 faas-cli -g $GATEWAY_URL deploy -f java-build-run.yml 
 echo "killing gateway proxy"

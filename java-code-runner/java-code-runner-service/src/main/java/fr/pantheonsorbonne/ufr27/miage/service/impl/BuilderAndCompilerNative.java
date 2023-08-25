@@ -7,6 +7,8 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.google.common.collect.Lists;
 import fr.pantheonsorbonne.ufr27.miage.model.*;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.*;
 import java.io.*;
@@ -23,6 +25,8 @@ import java.util.concurrent.*;
 
 @ApplicationScoped
 public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BuilderAndCompilerNative.class);
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -54,7 +58,16 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
             JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, diagnostics, Lists.newArrayList("-g"), null, compilationUnits1);
             if (compilationTask.call()) {
 
-                ClassLoader urlClassLoader = new URLClassLoader("java-runner", new URL[]{tmpDir.toUri().toURL()}, this.getClass().getClassLoader());
+                ClassLoader urlClassLoader = new URLClassLoader("java-runner", new URL[]{tmpDir.toUri().toURL()}, this.getClass().getClassLoader()){
+                    @Override
+                    public Class<?> loadClass(String name) throws ClassNotFoundException {
+                        LOGGER.info("loaded class" +name);
+                         return super.loadClass(name);
+
+                    }
+
+
+                };
 
                 try {
 
@@ -169,7 +182,8 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
     }
 
     private static void putErrorInTheResult(Result res, Throwable t) {
-        var runTimeError = new RuntimeError(t.getMessage());
+        //get message is sometime lacking, replacing by toString
+        var runTimeError = new RuntimeError(t.toString());
         res.getRuntimeError().add(runTimeError);
 
 
