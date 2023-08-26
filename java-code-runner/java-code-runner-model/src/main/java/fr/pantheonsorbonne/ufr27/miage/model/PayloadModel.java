@@ -16,4 +16,11 @@ public class PayloadModel {
     public void setSources(Collection<SourceFile> sources) {
         this.sources = sources;
     }
+
+    @Override
+    public String toString() {
+        return "PayloadModel{" +
+                "sources=" + sources +
+                '}';
+    }
 }

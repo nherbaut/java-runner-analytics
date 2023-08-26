@@ -52,11 +52,20 @@
       <artifactId>java-code-runner-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <dependency>
       <groupId>fr.pantheonsorbonne.ufr27.miage</groupId>
       <artifactId>java-code-runner-service</artifactId>
       <version>${project.version}</version>
+
     </dependency>
+
+    <dependency>
+      <groupId>org.jboss.logmanager</groupId>
+      <artifactId>log4j2-jboss-logmanager</artifactId>
+
+    </dependency>
+
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>

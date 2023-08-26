@@ -7,10 +7,7 @@ import fr.pantheonsorbonne.ufr27.miage.model.Result;
 import fr.pantheonsorbonne.ufr27.miage.model.RuntimeError;
 import fr.pantheonsorbonne.ufr27.miage.model.SourceFile;
 import fr.pantheonsorbonne.ufr27.miage.service.BuilderAndCompiler;
-
 import fr.pantheonsorbonne.ufr27.miage.service.impl.BuilderAndCompilerNative;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -18,26 +15,17 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class RunnerResourceTest {
 
 
-
-    BuilderAndCompiler builderAndCompiler=new BuilderAndCompilerNative();
-
-    @BeforeEach
-    public void reboot() {
-        builderAndCompiler.reboot();
-
-    }
-
     @Test
     public void testAllOK(
     ) throws IOException {
 
-
+        BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
         PayloadModel model = new PayloadModel();
         model.getSources().add(new SourceFile("Toto.java", "  public class Toto {\n" +
                 "        public static void main(String... args) {\n" +
@@ -47,7 +35,7 @@ public class RunnerResourceTest {
         var result = new Result();
         result.getStdout().add("salut\n");
 
-        assertEquals(result, builderAndCompiler.buildAndCompile(model,10, TimeUnit.SECONDS));
+        assertEquals(result, builderAndCompiler.buildAndCompile(model, 3, TimeUnit.SECONDS));
 
 
     }
@@ -55,7 +43,7 @@ public class RunnerResourceTest {
     @Test
 
     public void testTimeout() throws IOException {
-
+        BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
         PayloadModel model = new PayloadModel();
         model.getSources().add(new SourceFile("Toto.java", "  public class Toto {\n" +
                 "        public static void main(String... args) {\n" +
@@ -64,14 +52,14 @@ public class RunnerResourceTest {
                 "    }"));
         var result = new Result();
         result.getRuntimeError().add(new RuntimeError("Your code timed out", Collections.EMPTY_LIST));
-        assertEquals(result, builderAndCompiler.buildAndCompile(model,5, TimeUnit.SECONDS));
+        assertEquals(result, builderAndCompiler.buildAndCompile(model, 5, TimeUnit.SECONDS));
 
     }
 
     @Test
 
     public void testCompileError() throws IOException {
-
+        BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
         PayloadModel model = new PayloadModel();
         model.getSources().add(new SourceFile("Toto.java", "  public class T oto {\n" +
                 "        public static void main(String... args) {\n" +
@@ -80,8 +68,43 @@ public class RunnerResourceTest {
                 "    }"));
         ObjectMapper mapper = new ObjectMapper();
         Result result = mapper.readValue("{\"stdout\":[],\"runtimeError\":[],\"compilationDiagnostic\":[{\"source\":\"Toto.java\",\"messageEN\":\"'{' expected\",\"code\":\"compiler.err.expected\",\"position\":16,\"startPosition\":16,\"endPosition\":16,\"lineNumber\":1,\"columnNumber\":17,\"messageFR\":\"'{' expected\",\"kind\":\"ERROR\"}]}", Result.class);
-        assertEquals(result, builderAndCompiler.buildAndCompile(model,10, TimeUnit.SECONDS));
+        assertEquals(result, builderAndCompiler.buildAndCompile(model, 10, TimeUnit.SECONDS));
 
+    }
+
+    @Test
+    public void testForbiddenClass() throws IOException {
+        BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
+        PayloadModel model = new PayloadModel();
+        model.getSources().add(new SourceFile("FileWritingTest.java", "import java.io.BufferedWriter;\n" +
+                "import java.io.FileWriter;\n" +
+                "import java.io.IOException;\n" +
+                "\n" +
+                "public class FileWritingTest {\n" +
+                "    public static void main(String[] args) {\n" +
+                "        String directoryPath = \"/home/app\";  // Update this with the desired directory path\n" +
+                "        String fileName = \"testFile.txt\";\n" +
+                "        String fileContent = \"This is the content of the test file.\";\n" +
+                "\n" +
+                "        try {\n" +
+                "            String filePath = directoryPath + \"/\" + fileName;\n" +
+                "            \n" +
+                "            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));\n" +
+                "            writer.write(fileContent);\n" +
+                "            writer.close();\n" +
+                "            \n" +
+                "            System.out.println(\"File created and written successfully: \" + filePath);\n" +
+                "        } catch (IOException e) {\n" +
+                "            System.err.println(\"An error occurred: \" + e.getMessage());\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n"));
+        ObjectMapper mapper = new ObjectMapper();
+        Result result = builderAndCompiler.buildAndCompile(model, 10, TimeUnit.SECONDS);
+        System.out.println(result.toString());
+        assertTrue(result.getStdout().isEmpty());
+        assertTrue(result.getCompilationDiagnostic().isEmpty());
+        assertTrue(result.getRuntimeError().size() == 1);
     }
 
 }
