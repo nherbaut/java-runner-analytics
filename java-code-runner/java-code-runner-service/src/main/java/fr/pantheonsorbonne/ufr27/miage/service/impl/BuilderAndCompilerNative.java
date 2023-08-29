@@ -277,6 +277,8 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
         forbiddenClasses.add("java.lang.runtime.*");
         forbiddenClasses.add("java.lang.module.*");
         forbiddenClasses.add("java.lang.management.*");
+        forbiddenClasses.add("sun.misc.Unsafe");
+
 
 
         forbiddenPatterns = forbiddenClasses.stream().map(s -> Pattern.compile(s)).collect(Collectors.toList());
