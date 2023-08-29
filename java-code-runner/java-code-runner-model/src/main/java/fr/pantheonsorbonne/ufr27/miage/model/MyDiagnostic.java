@@ -33,11 +33,11 @@ public class MyDiagnostic {
     public MyDiagnostic(String messageEN, String code, Long position, Long startPosition, Long endPosition, Long lineNumber, Long columnNumber, String messageFR, String source, String kind) {
         this.messageEN = messageEN;
         this.code = code;
-        this.position = position;
-        this.startPosition = startPosition;
-        this.endPosition = endPosition;
-        this.lineNumber = lineNumber;
-        this.columnNumber = columnNumber;
+        this.position = position!=Diagnostic.NOPOS?position:0;
+        this.startPosition = startPosition!=Diagnostic.NOPOS?startPosition:0;
+        this.endPosition = endPosition!=Diagnostic.NOPOS?endPosition:0;
+        this.lineNumber = lineNumber!=Diagnostic.NOPOS?lineNumber:0;
+        this.columnNumber = columnNumber!=Diagnostic.NOPOS?columnNumber:0;
         this.messageFR = messageFR;
         this.source = source;
         this.kind = kind;
