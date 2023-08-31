@@ -5,7 +5,22 @@ import java.util.List;
 import java.util.Objects;
 
 public class Result {
-    List<String> stdout = new ArrayList<>();
+    private static final int STDOUT_LENGHT_LIMIT = 2000;
+
+    public String getStdout() {
+        return stdout.toString();
+    }
+
+    public void setStdout(String stdout) {
+        this.stdout = new StringBuilder(stdout);
+    }
+
+    public void appendStdout(String stdout) {
+        if (this.stdout.length() <= STDOUT_LENGHT_LIMIT)
+            this.stdout.append(stdout);
+    }
+
+    StringBuilder stdout = new StringBuilder();
 
     public Result() {
     }
@@ -18,21 +33,11 @@ public class Result {
     List<RuntimeError> runtimeError = new ArrayList<>();
 
 
-
-
     public List<MyDiagnostic> getCompilationDiagnostic() {
         return compilationDiagnostic;
     }
 
     List<MyDiagnostic> compilationDiagnostic = new ArrayList<>();
-
-    public List<String> getStdout() {
-        return stdout;
-    }
-
-    public void setStdout(List<String> stdout) {
-        this.stdout = stdout;
-    }
 
 
     @Override

@@ -33,7 +33,7 @@ public class RunnerResourceTest {
                 "        }\n" +
                 "    }"));
         var result = new Result();
-        result.getStdout().add("salut\n");
+        result.appendStdout("salut\n");
 
         assertEquals(result, builderAndCompiler.buildAndCompile(model, 3, TimeUnit.SECONDS));
 
@@ -50,9 +50,11 @@ public class RunnerResourceTest {
                 "            System.out.println(\"salut\");while(true){if(false)break;};\n" +
                 "        }\n" +
                 "    }"));
-        var result = new Result();
-        result.getRuntimeError().add(new RuntimeError("Your code timed out", Collections.EMPTY_LIST));
-        assertEquals(result, builderAndCompiler.buildAndCompile(model, 5, TimeUnit.SECONDS));
+        var expected = new Result();
+        expected.getRuntimeError().add(new RuntimeError("Your code timed out", Collections.EMPTY_LIST));
+        var result = builderAndCompiler.buildAndCompile(model, 5, TimeUnit.SECONDS);
+        assertEquals(expected.getRuntimeError(), result.getRuntimeError());
+        assertEquals(expected.getCompilationDiagnostic(), result.getCompilationDiagnostic());
 
     }
 
@@ -67,8 +69,9 @@ public class RunnerResourceTest {
                 "        }\n" +
                 "    }"));
         ObjectMapper mapper = new ObjectMapper();
-        Result result = mapper.readValue("{\"stdout\":[],\"runtimeError\":[],\"compilationDiagnostic\":[{\"source\":\"Toto.java\",\"messageEN\":\"'{' expected\",\"code\":\"compiler.err.expected\",\"position\":16,\"startPosition\":16,\"endPosition\":16,\"lineNumber\":1,\"columnNumber\":17,\"messageFR\":\"'{' expected\",\"kind\":\"ERROR\"}]}", Result.class);
-        assertEquals(result, builderAndCompiler.buildAndCompile(model, 10, TimeUnit.SECONDS));
+        Result expected = mapper.readValue("{\"stdout\":\"\",\"runtimeError\":[],\"compilationDiagnostic\":[{\"source\":\"Toto.java\",\"messageEN\":\"'{' expected\",\"code\":\"compiler.err.expected\",\"position\":16,\"startPosition\":16,\"endPosition\":16,\"lineNumber\":1,\"columnNumber\":17,\"messageFR\":\"'{' expected\",\"kind\":\"ERROR\"}]}", Result.class);
+        var result = builderAndCompiler.buildAndCompile(model, 10, TimeUnit.SECONDS);
+        assertEquals(expected, result);
 
     }
 

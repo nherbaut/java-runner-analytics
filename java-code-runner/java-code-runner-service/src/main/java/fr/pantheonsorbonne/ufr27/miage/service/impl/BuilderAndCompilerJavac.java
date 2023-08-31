@@ -58,7 +58,7 @@ public class BuilderAndCompilerJavac extends BuilderAndCompilerAdapter {
             Process process = builder.start();
 
             StreamGobbler streamGobbler =
-                    new StreamGobbler(process.getInputStream(), process.getErrorStream(), s -> result.getStdout().add(s), s -> result.getCompilationDiagnostic().add(new MyDiagnostic(s,"")));
+                    new StreamGobbler(process.getInputStream(), process.getErrorStream(), s -> result.appendStdout(s), s -> result.getCompilationDiagnostic().add(new MyDiagnostic(s,"")));
             EXECUTOR_SERVICE.submit(streamGobbler);
 
 
