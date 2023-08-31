@@ -31,10 +31,10 @@
         let action="authpage";
         let uuid=window.crypto.randomUUID();
         const token = await grecaptcha.enterprise.execute("{reCAPTCHA_site_key}", { action: action});
-        fetch("/auth", {
+        fetch("/", {
             method: "POST",
             headers: {
-                "RECAPTCH_TOKEN": token,
+                "RECAPTCH-TOKEN": token,
                 "UUID": uuid,
                 "ACTION": action
             },

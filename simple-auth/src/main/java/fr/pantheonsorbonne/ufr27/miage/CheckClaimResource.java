@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
-@Path("auth/claims-check/")
+@Path("claims-check")
 public class CheckClaimResource {
     @CheckedTemplate
     public static class Templates {

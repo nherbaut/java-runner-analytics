@@ -1,7 +1,9 @@
+k: build-push k-refresh k-logs
+
 build:
 	quarkus build -Dquarkus.container-image.build=true
-push:
-	quarkus build -Dquarkus.container-image.push=true
+build-push:
+	quarkus build -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
 run:
 	quarkus dev
 run-docker:
@@ -16,4 +18,10 @@ run-docker:
 	-e MP_JWT_VERIFY_PUBLICKEY="$(shell cat src/main/resources/crypto/publicKey.pem |tr -d '\n')" \
 	-p 8079:8080 \
 	nherbaut/simple-auth:1.0.0-SNAPSHOT
+
+k-refresh:
+	kubectl delete pods -l app=simple-auth && sleep 10
+
+k-logs:
+	kubectl logs -l app=simple-auth -f
 	
