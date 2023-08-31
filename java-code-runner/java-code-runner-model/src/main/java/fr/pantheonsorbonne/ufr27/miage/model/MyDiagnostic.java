@@ -35,7 +35,7 @@ public class MyDiagnostic {
         this.code = code;
         this.position = position!=Diagnostic.NOPOS?position:0;
         this.startPosition = startPosition!=Diagnostic.NOPOS?startPosition:0;
-        this.endPosition = endPosition!=Diagnostic.NOPOS?endPos ition:0;
+        this.endPosition = endPosition!=Diagnostic.NOPOS?endPosition:0;
         this.lineNumber = lineNumber!=Diagnostic.NOPOS?lineNumber:0;
         this.columnNumber = columnNumber!=Diagnostic.NOPOS?columnNumber:0;
         this.messageFR = messageFR;

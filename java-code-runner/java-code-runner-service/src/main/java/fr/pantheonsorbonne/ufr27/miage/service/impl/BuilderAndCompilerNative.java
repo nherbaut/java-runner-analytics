@@ -280,7 +280,6 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
         forbiddenClasses.add("sun.misc.Unsafe");
 
 
-
         forbiddenPatterns = forbiddenClasses.stream().map(s -> Pattern.compile(s)).collect(Collectors.toList());
     }
 
@@ -393,28 +392,41 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
     }
 
     private static void invokeMethod(Result res, Method method) throws IllegalAccessException, InvocationTargetException {
-        ByteArrayOutputStream out = null;
-        ByteArrayOutputStream err = null;
-        PrintStream out1 = null;
-        PrintStream err1 = null;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        PrintStream out1 = new PrintStream(out);
+        PrintStream err1 = new PrintStream(err);
+        System.setOut(out1);
+        System.setErr(err1);
         try {
-            out = new ByteArrayOutputStream();
-            err = new ByteArrayOutputStream();
-            out1 = new PrintStream(out);
-            System.setOut(out1);
-            err1 = new PrintStream(err);
-            System.setErr(err1);
+
             try {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while(true) {
+                            out1.flush();
+                            err1.flush();
+                            res.setStdout(out.toString());
+                            try {
+                                Thread.sleep(500L);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                }).start();
                 method.invoke(null, new Object[]{new String[0]});
             } catch (Throwable t) {
                 //if an error happens in the code, it will be wrapped in a cause
                 //if an error happens with our stuff, there will be no cause, so pass the throwable directlymake
                 putErrorInTheResult(res, t.getCause() != null ? t.getCause() : t);
             }
+
+        } finally {
             out1.flush();
             err1.flush();
-            res.getStdout().add(out.toString());
-        } finally {
+            res.setStdout(out.toString());
             closeIfNotNull(out, err, out1, err1);
 
         }
