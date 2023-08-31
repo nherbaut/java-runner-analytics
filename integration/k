@@ -1,0 +1,12 @@
+#!/bin/bash
+kamel run \
+-d camel:vertx-websocket \
+--name=event-sink \
+--trait service.enabled=true \
+--trait service.auto=false \
+--trait service.type=NodePort \
+--trait ingress.enabled=false \
+--trait container.expose=true \
+--trait container.port=8080 \
+Example.java \
+--dev
