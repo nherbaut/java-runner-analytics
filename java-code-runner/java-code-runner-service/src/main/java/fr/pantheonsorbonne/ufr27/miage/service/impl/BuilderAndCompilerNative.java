@@ -290,9 +290,12 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
         try {
             List<File> files = generateFiles(model, tmpDir);
 
-            MethodDeclaration methodDeclaration = null;
+            Optional<MethodDeclaration> methodDeclaration = Optional.empty();
             try {
                 methodDeclaration = findAMainMethod(model);
+                if (methodDeclaration.isEmpty()) {
+                    res.getRuntimeError().add(new RuntimeError("Can't execute code without a public static void main(String ...args){} method"));
+                }
             } catch (ParseProblemException e) {
                 //can't parse the Javafile, it means we let the compiler report the errors
             }
@@ -308,10 +311,10 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
             Iterable<? extends JavaFileObject> compilationUnits1 =
                     fileManager.getJavaFileObjectsFromFiles(files);
             JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, diagnostics, Lists.newArrayList("-g"), null, compilationUnits1);
-            if (compilationTask.call()) {
+            if (compilationTask.call() && methodDeclaration.isPresent()) {
 
 
-                MethodDeclaration finalMethodDeclaration = methodDeclaration;
+                MethodDeclaration finalMethodDeclaration = methodDeclaration.get();
                 Future<?> execution = executorService.submit(() -> {
                     try {
                         ClassLoader urlClassLoader = new FilteringURLClassLoader(tmpDir);
@@ -366,7 +369,7 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
         executorService = Executors.newSingleThreadExecutor();
     }
 
-    private static MethodDeclaration findAMainMethod(PayloadModel model) {
+    private static Optional<MethodDeclaration> findAMainMethod(PayloadModel model) {
         return model.getSources().stream()
                 .map(s -> StaticJavaParser.parse(s.getContent()))
                 .flatMap(cu -> cu.getTypes().stream())
@@ -378,7 +381,7 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
                 .filter(md -> md.getParameters().getFirst().isPresent() &&
                         (md.getParameters().getFirst().get().isVarArgs() && md.getParameters().getFirst().get().getType().asString().equals("String"))
                         || (md.getParameters().getFirst().get().getType().isArrayType()) && md.getParameters().getFirst().get().getType().asArrayType().getElementType().asString().equals("String"))
-                .findFirst().orElseThrow();
+                .findFirst();
     }
 
     private static Method getMainMethodFromMethodDeclaration(MethodDeclaration methodDeclaration, ClassLoader urlClassLoader) throws ClassNotFoundException {
@@ -404,7 +407,7 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        while(true) {
+                        while (true) {
                             out1.flush();
                             err1.flush();
                             res.setStdout(out.toString());

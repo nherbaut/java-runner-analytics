@@ -41,6 +41,16 @@ public class RunnerResourceTest {
     }
 
     @Test
+    public void testVoidCode() throws IOException {
+        BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
+        PayloadModel model = new PayloadModel();
+        model.getSources().add(new SourceFile("Toto.java", ""));
+        Result res = builderAndCompiler.buildAndCompile(model, 3, TimeUnit.SECONDS);
+        assertEquals(1,res.getRuntimeError().size());
+
+    }
+
+    @Test
 
     public void testTimeout() throws IOException {
         BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
