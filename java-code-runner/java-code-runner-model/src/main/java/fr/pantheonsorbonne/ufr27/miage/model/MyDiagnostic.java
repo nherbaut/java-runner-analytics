@@ -150,4 +150,20 @@ public class MyDiagnostic {
     public void setKind(String kind) {
         this.kind = kind;
     }
+
+    @Override
+    public String toString() {
+        return "MyDiagnostic{" +
+                "source='" + source + '\'' +
+                ", messageEN='" + messageEN + '\'' +
+                ", code='" + code + '\'' +
+                ", position=" + position +
+                ", startPosition=" + startPosition +
+                ", endPosition=" + endPosition +
+                ", lineNumber=" + lineNumber +
+                ", columnNumber=" + columnNumber +
+                ", messageFR='" + messageFR + '\'' +
+                ", kind='" + kind + '\'' +
+                '}';
+    }
 }

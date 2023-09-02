@@ -20,6 +20,33 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RunnerResourceTest {
 
+    @Test
+    public void testBlackList() throws IOException {
+        String code = "import java.util.ArrayList;\n" +
+                "import java.util.Collection;\n" +
+                "import java.util.function.Function;\n" +
+                "import java.util.function.UnaryOperator;\n" +
+                "\n" +
+                "public class Main {\n" +
+                "\n" +
+                "    \n" +
+                "    public static void main(String... args) {\n" +
+                "\n" +
+                "    UnaryOperator<Character> lowerCase = c -> Character.toLowerCase(c);\n" +
+                "\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "}\n";
+
+        BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
+        PayloadModel model = new PayloadModel();
+        model.getSources().add(new SourceFile("Main.java", code));
+        var result = new Result();
+        result.appendStdout("");
+
+        assertEquals(result, builderAndCompiler.buildAndCompile(model, 3, TimeUnit.SECONDS));
+    }
 
     @Test
     public void testAllOK(
