@@ -17,7 +17,7 @@ echo "removing the previous function if possible"
 faas-cli -g $OPENFAAS_URL remove -f ../functions/java-build-run.yml
 cd ../java-code-runner
 echo "building java package"
-mvn clean package 
+mvn clean package install
 cd ..
 echo "copying java runner to dockerfile location"
 cp java-code-runner/java-code-runner-cli/target/*-runner.jar functions/java-build-run/runner.jar 
