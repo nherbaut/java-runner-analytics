@@ -21,6 +21,92 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RunnerResourceTest {
 
     @Test
+    public void testNoNoteDiad() throws IOException {
+        String code = "public class ClosedPoker {\n" +
+                "    \n" +
+                "    public static class Player{\n" +
+                "        //les attributs\n" +
+                "        //le constructeur\n" +
+                "        public Player(String name){}\n" +
+                "        //les méthodes\n" +
+                "        public void setHand(Deck[] deck){}\n" +
+                "        public boolean beats(Player other){return false;}\n" +
+                "        public String getHandString(){return \"\";}\n" +
+                "        public Card[] getCardsToDiscard(){ return new Card[0]; }\n" +
+                "        public void addCard(Card[] cards){}\n" +
+                "    }\n" +
+                "    \n" +
+                "    public static class Deck{\n" +
+                "        //les attributs\n" +
+                "        //le constructeur\n" +
+                "        public Deck(){}\n" +
+                "        //les méthodes\n" +
+                "        static public Deck[] getRandomCards(int deckSize){return new Deck[0];};\n" +
+                "        static public Deck[] newRandomHand(){return new Deck[0];};\n" +
+                "        \n" +
+                "        \n" +
+                "        \n" +
+                "        \n" +
+                "    }\n" +
+                "    \n" +
+                "    public static class Card{\n" +
+                "        //les attributs\n" +
+                "        //le constructeur\n" +
+                "        public Card(){}\n" +
+                "        //les méthodes\n" +
+                "        \n" +
+                "    }\n" +
+                "    \n" +
+                "    \n" +
+                "    public static void main(String ...args){\n" +
+                "        Player p1 = new Player(\"Nicolas\");\n" +
+                "        Player p2 = new Player(\"Elio\");\n" +
+                "        Player p3 = new Player(\"Flavio\");\n" +
+                "\n" +
+                "        //give the players some cards\n" +
+                "        p1.setHand(Deck.newRandomHand());\n" +
+                "        p2.setHand(Deck.newRandomHand());\n" +
+                "        p3.setHand(Deck.newRandomHand());\n" +
+                "\n" +
+                "        //returns the cards the players want to discard and get new ones\n" +
+                "        Card[] cardsP1=p1.getCardsToDiscard();\n" +
+                "        p1.addCard(Deck.getRandomCards(cardsP1.length));\n" +
+                "\n" +
+                "        Card[] cardsP2=p2.getCardsToDiscard();\n" +
+                "        p2.addCard(Deck.getRandomCards(cardsP2.length));\n" +
+                "\n" +
+                "        Card[] cardsP3=p3.getCardsToDiscard();\n" +
+                "        p3.addCard(Deck.getRandomCards(cardsP3.length));\n" +
+                "\n" +
+                "        //check who wins\n" +
+                "        if(p1.beats(p2) && p1.beats(p3)){\n" +
+                "            System.out.println(\"P1 wins with hand\"+p1.getHandString());\n" +
+                "        }\n" +
+                "\n" +
+                "        else if(p2.beats(p1) && p2.beats(p3)){\n" +
+                "            System.out.println(\"P2 wins with hand\"+p2.getHandString());\n" +
+                "        }\n" +
+                "\n" +
+                "        else if(p3.beats(p1) && p3.beats(p3)){\n" +
+                "            System.out.println(\"P3 wins with hand\"+p2.getHandString());\n" +
+                "        }\n" +
+                "        else{\n" +
+                "            System.out.println(\"there is a draw\");\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+
+        BuilderAndCompiler builderAndCompiler = new BuilderAndCompilerNative();
+        PayloadModel model = new PayloadModel();
+        model.getSources().add(new SourceFile("ClosedPoker.java", code));
+        var result = new Result();
+        result.appendStdout("");
+
+        var res = builderAndCompiler.buildAndCompile(model, 3, TimeUnit.SECONDS);
+        //should not throw in case of note, since notes don't have source
+    }
+
+    @Test
     public void testBlackList() throws IOException {
         String code = "import java.util.ArrayList;\n" +
                 "import java.util.Collection;\n" +
@@ -73,7 +159,7 @@ public class RunnerResourceTest {
         PayloadModel model = new PayloadModel();
         model.getSources().add(new SourceFile("Toto.java", ""));
         Result res = builderAndCompiler.buildAndCompile(model, 3, TimeUnit.SECONDS);
-        assertEquals(1,res.getRuntimeError().size());
+        assertEquals(1, res.getRuntimeError().size());
 
     }
 

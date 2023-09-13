@@ -34,7 +34,6 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
-
     @Override
     public Result buildAndCompile(PayloadModel model, long delay, TimeUnit timeUnit) throws IOException {
         Result res = new Result();
@@ -97,11 +96,9 @@ public class BuilderAndCompilerNative extends BuilderAndCompilerAdapter {
             }
 
 
-            diagnostics.getDiagnostics().
-
-                    forEach((diagnostic) ->
-
-                            res.getCompilationDiagnostic().add(MyDiagnostic.fromDiagnosis(diagnostic)));
+            diagnostics.getDiagnostics().stream()
+                    .filter(d -> !d.getKind().equals(Diagnostic.Kind.NOTE) && !d.getKind().equals(Diagnostic.Kind.OTHER))
+                    .forEach((diagnostic) -> res.getCompilationDiagnostic().add(MyDiagnostic.fromDiagnosis(diagnostic)));
 
 
             fileManager.close();
