@@ -1,4 +1,7 @@
-k: build-push k-refresh k-logs
+k: clean build-push k-refresh k-logs
+
+clean:
+	mvn clean
 
 build:
 	quarkus build -Dquarkus.container-image.build=true

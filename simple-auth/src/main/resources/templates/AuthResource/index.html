@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Choose your Auth provider</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+          integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+
+</head>
+<body>
+
+
+<div class="bg-light p-5 rounded-lg m-3">
+    <h1 class="display-4">Choose how you sign-in</h1>
+
+    <div class="container">
+        <div class="row">
+            <div class="flex items-center justify-center h-screen bg-discord-gray text-white col">
+                <button type="button" class="btn btn-primary" onclick="window.open('/discord?callback={callback}','_parent');"><span
+                            class="fa-brands fa-discord"></span> Discord (requires a Discord Account, you'll need to refresh this window after login)
+                </button>
+            </div>
+
+            <div class="flex items-center justify-center h-screen bg-google text-white col">
+                <button type="button" class="btn btn-secondary" onclick="window.location='/anonymous?callback={callback}';"><i
+                            class="fa-brands fa-google text-2xl"></i> Anon Login (won't work in public wifi)
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+
+
+</body>
+</html>

@@ -1,6 +1,5 @@
-package fr.pantheonsorbonne.ufr27.miage.auth;
+package fr.pantheonsorbonne.ufr27.miage.auth.google;
 
-import jakarta.annotation.Nullable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
