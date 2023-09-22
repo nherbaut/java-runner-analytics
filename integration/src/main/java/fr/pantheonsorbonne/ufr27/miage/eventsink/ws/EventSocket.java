@@ -1,27 +1,29 @@
 package fr.pantheonsorbonne.ufr27.miage.eventsink.ws;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import fr.pantheonsorbonne.ufr27.miage.eventsink.model.Event;
+import fr.pantheonsorbonne.ufr27.miage.eventsink.model.EventDTO;
 import fr.pantheonsorbonne.ufr27.miage.eventsink.service.EventGateway;
 import fr.pantheonsorbonne.ufr27.miage.eventsink.ws.auth.WebSocketSecurityConfigurator;
 import io.quarkus.security.Authenticated;
-import io.quarkus.security.identity.IdentityProvider;
-import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.runtime.SecurityIdentityAssociation;
-import io.smallrye.jwt.auth.cdi.PrincipalProducer;
+import io.quarkus.vertx.core.runtime.context.VertxContextSafetyToggle;
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.common.vertx.VertxContext;
+
+import io.smallrye.mutiny.Uni;
+import io.vertx.core.Context;
+import io.vertx.core.Vertx;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.SecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 @ServerEndpoint(value = "/ws/event", configurator = WebSocketSecurityConfigurator.class)
 @ApplicationScoped
@@ -36,7 +38,7 @@ public class EventSocket {
     @Authenticated
     @OnOpen
     public void onOpen(Session session) {
-        LOGGER.error("connection opened");
+        LOGGER.info("connection opened");
     }
 
 
@@ -53,23 +55,32 @@ public class EventSocket {
     @Inject
     SecurityIdentityAssociation identity;
 
+    @Inject
+    Vertx vertx;
+
     @OnMessage
+    @RolesAllowed({"discord-auth", "recaptcha-cleared"})
+    @Blocking
     public void onMessage(final Session session, String message) throws IOException {
+
 
         if ("keepalive".equals(message)) {
             return;
         }
 
-
-        Event eventToPublish = createEventFromMessage(message);
-        gateway.publishEvent(eventToPublish);
+        EventDTO eventToPublish = createEventFromMessage(message);
+        Context context = VertxContext.getOrCreateDuplicatedContext(vertx);
+        VertxContextSafetyToggle.setContextSafe(context, Boolean.TRUE);
+        context.runOnContext(x -> {
+            gateway.publishEvent(eventToPublish).subscribe().with(panacheEntityBase -> LOGGER.trace("Persisted " + panacheEntityBase));
+        });
 
 
     }
 
-    private Event createEventFromMessage(String message) throws IOException {
-        Event eventFromApplication = jsonWriter.readValue(message, Event.class);
-        Event eventToPublish = new Event(EventSocket.class.getName(), eventFromApplication.application(), identity.getIdentity().getPrincipal().getName(), eventFromApplication.type(), eventFromApplication.payload());
+    private EventDTO createEventFromMessage(String message) throws IOException {
+        EventDTO eventFromApplication = jsonWriter.readValue(message, EventDTO.class);
+        EventDTO eventToPublish = new EventDTO(EventSocket.class.getName(), eventFromApplication.application(), identity.getIdentity().getPrincipal().getName(), eventFromApplication.type(), eventFromApplication.payload());
         return eventToPublish;
     }
 

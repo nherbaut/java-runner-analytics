@@ -9,8 +9,8 @@ functions:
     image: nherbaut/java-build-run:latest
     labels:
       
-      com.openfaas.scale.min: "1"
-      com.openfaas.scale.max: "1"
+      com.openfaas.scale.min: "5"
+      com.openfaas.scale.max: "5"
       com.openfaas.scale.factor: "20"
       com.openfaas.scale.zero: false
     environment:
