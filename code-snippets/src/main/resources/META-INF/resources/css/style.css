@@ -1,0 +1,13 @@
+.snip-action {
+    margin: 0 10px 0 10px;
+}
+
+.snip-play {
+    color: #26a269;
+    text-decoration: none;
+}
+
+.snip-delete {
+    color: #c01c28;
+    text-decoration: none;
+}
