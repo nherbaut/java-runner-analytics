@@ -26,20 +26,50 @@
         </div>
         <div class="mb-3">
             <label for="fileContent" class="form-label">File Content</label>
-            <textarea id="fileContent" class="form-control" >{snippet.files.get(0).content}</textarea>
+            <textarea id="fileContent" class="form-control">{snippet.files.get(0).content}</textarea>
         </div>
+
         {#if snippet.comments.size > 0}
             <div class="mb-3">
             <label for="comment" class="form-label">Comment</label>
             <input type="text" id="comment" class="form-control" value="{snippet.comments.get(0).content}"/>
             </div>
         {/if}
-        {#if snippet.owner == userId }
-            <input type="submit" id="formSubmit" class="form-control btn btn-primary" value="Save changes"/>
-            <input type="button" id="my-snips" class="form-control btn btn-secondary" value="Back to my snippets"/>
-            <input type="button" id="del-snip" class="form-control btn btn-danger" value="Delete this Snippet"/>
 
-        {/if}
+        <div class="mb-3">
+            <h2>Metadata</h2>
+            <a href="#" id="add-meta" class="fa-solid fa-plus fa-xl"></a>
+
+            <div class="row" id="meta-container">
+
+            </div>
+
+        </div>
+
+
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <input type="button" id="run-snip" class="form-control btn btn-success" value="Run"/>
+                    <input type="button" id="all-snips" class="form-control btn btn-secondary" value="Show All"/>
+                </div>
+
+                {#if canEdit }
+                <div class="btn-group mr-2" role="group" aria-label="Second group">
+                    <input type="submit" id="formSubmit" class="form-control btn btn-primary" value="Save"/>
+                    <input type="button" id="my-snips" class="form-control btn btn-secondary" value="Show Mine"/>
+                    <input type="button" id="del-snip" class="form-control btn btn-danger" value="Delete"/>
+                </div>
+                {/if}
+
+            </div>
+
+
+
+
+
+
+
 
     </form>
 </div>
@@ -48,14 +78,33 @@
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
 <script type="module">
-    import { snippet_auth, delSnippet, createFile, createComment, updateSnippet } from "{codeSnippetApiURL}/js/snippet.js"
+    import {
+        snippet_auth,
+        delSnippet,
+        createFile,
+        createComment,
+        updateSnippet,
+        createMeta
+    } from "{codeSnippetApiURL}/js/snippet.js"
+
+    import {
+        createNewMetaForm,
+        extractMetas
+
+    } from "{codeSnippetApiURL}/js/script.js"
+
 
     var changed = false;
     for (let elt of document.querySelectorAll("input, textarea")) {
         elt.addEventListener("change", function () {
             changed = true;
         })
-    }
+    };
+    let metaContainer = document.getElementById("meta-container");
+
+    {#for meta in snippet.metas}
+        createNewMetaForm(metaContainer,"{meta.key}","{meta.value}");
+    {/for}
 
     snippet_auth("{codeSnippetApiURL}");
     document.getElementById("snippet").addEventListener("submit", function (evt) {
@@ -69,9 +118,12 @@
         }
 
 
+
         let files = [createFile(fileName, fileContent)];
         let comments = [createComment(comment)];
-        updateSnippet("{snippet.id}", title, files, comments).then(response => {
+        let metacontainer = document.getElementById("meta-container");
+        let metas = extractMetas(metacontainer);
+        updateSnippet("{snippet.id}", title, files, comments, metas).then(response => {
             if (response.ok) {
                 console.log(response);
                 location.reload();
@@ -89,9 +141,29 @@
     });
 
     document.getElementById("my-snips").addEventListener("click", function () {
-        if(!changed || window.confirm("drop changes to this snippet?")){
-                    window.location = "/user/me";
+        if (!changed || window.confirm("drop changes to this snippet?")) {
+            window.location = "/user/me";
         }
+    });
+
+    document.getElementById("run-snip").addEventListener("click", function () {
+        if (!changed || window.confirm("Discard unsaved Changes?")) {
+            window.location = "https://java.miage.dev/?snipId={snippet.id}";
+        }
+    });
+
+    document.getElementById("all-snips").addEventListener("click", function () {
+        if (!changed || window.confirm("Discard unsaved Changes?")) {
+            window.location = "https://code-snippet.miage.dev/snippet/all";
+        }
+    });
+
+    document.getElementById("add-meta").addEventListener("click", function (evt) {
+        evt.preventDefault();
+        let metaContainer = document.getElementById("meta-container");
+        createNewMetaForm(metaContainer);
+
+
     });
 </script>
 </html>

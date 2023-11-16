@@ -11,5 +11,7 @@ import java.util.List;
 @TemplateExtension
 public class TemplateExtensions {
 
-
+    public static boolean declareNeedHelp(Snippet snippet) {
+        return snippet.metas.stream().filter( meta -> meta.key.equals("helpNeeded") && meta.value.equals("true")).findAny().isPresent();
+    }
 }

@@ -1,0 +1,5 @@
+selenium>=3.141.0
+dateparser>=0.7.6
+requests>=2.24.0
+PyVirtualDisplay>=2.0.0
+xvfbwrapper>=0.2.9

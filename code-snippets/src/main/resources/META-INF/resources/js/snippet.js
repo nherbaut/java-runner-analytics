@@ -68,7 +68,11 @@ function createComment(content) {
     return {content: content};
 }
 
-async function updateSnippet(snippetId, title, files, comments) {
+function createMeta(key, value) {
+    return {key: key, value: value};
+}
+
+async function updateSnippet(snippetId, title, files, comments, metas) {
     var postHeaders = {...headers};
     postHeaders["Content-type"] = "application/json";
 
@@ -82,15 +86,22 @@ async function updateSnippet(snippetId, title, files, comments) {
             body: JSON.stringify({
                 title: title,
                 files: files,
-                comments: comments
+                comments: comments,
+                metas: metas
             })
 
         });
     return response;
 }
 
-async function createSnippet(title, files, comments) {
+async function createSnippet(title, files, comments, metas) {
 
+    if (metas == undefined) {
+        metas = [];
+    }
+    if (comments == undefined) {
+        comments = [];
+    }
     var postHeaders = {...headers};
     postHeaders["Content-type"] = "application/json";
 
@@ -104,11 +115,22 @@ async function createSnippet(title, files, comments) {
             body: JSON.stringify({
                 title: title,
                 files: files,
-                comments: comments
+                comments: comments,
+                metas: metas
             })
 
         });
     return response;
 }
 
-export {snippet_auth, getMySnippets, delSnippet, createSnippet, createFile, createComment, getSnippet, updateSnippet}
+export {
+    snippet_auth,
+    getMySnippets,
+    delSnippet,
+    createSnippet,
+    createFile,
+    createComment,
+    getSnippet,
+    updateSnippet,
+    createMeta
+}

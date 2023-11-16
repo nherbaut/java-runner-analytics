@@ -19,9 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -54,6 +52,10 @@ public class DiscordOAuth {
     @Inject
     StateManager stateManager;
 
+    @ConfigProperty(name = "fr.pantheonsorbonne.ufr27.miage.admin-emails")
+    List<String> adminEmails;
+
+
     @GET
     public Response getAuth(@QueryParam("callback") String callback) {
 
@@ -78,8 +80,21 @@ public class DiscordOAuth {
             DiscordUserResponse discordUser = discordAPI.getDiscordUser("Bearer " + resp.accessToken());
 
             JwtClaimsBuilder builder1 = Jwt.claims();
-            String token = builder1.groups("discord-auth").claim("discord-token", resp.accessToken()).claim("discord-refresh-token", resp.refreshToken()).claim("discord-expires-in", resp.expiresIn()).preferredUserName(discordUser.global_name()).claim(Claims.email, discordUser.email()).expiresAt(Instant.now().plus(1L, TimeUnit.DAYS.toChronoUnit())).issuer(issuer).sign();
+            JwtClaimsBuilder claimsBuilder = builder1
+                    .claim("discord-token", resp.accessToken())
+                    .claim("discord-refresh-token", resp.refreshToken())
+                    .claim("discord-expires-in", resp.expiresIn())
+                    .preferredUserName(discordUser.global_name())
+                    .claim(Claims.email, discordUser.email())
+                    .expiresAt(Instant.now().plus(1L, TimeUnit.DAYS.toChronoUnit())).issuer(issuer);
 
+            if (adminEmails.contains(discordUser.email())) {
+                claimsBuilder.groups(Set.of("discord-auth", "helpers"));
+            }
+            else{
+                claimsBuilder.groups(Set.of("discord-auth"));
+            }
+            String token = claimsBuilder.sign();
             String referer = new String(Base64.getDecoder().decode(state.getBytes())).split(",")[1];
             URI redirectURI = UriBuilder.fromUri(referer).queryParam("token", token).build();
             return Response.seeOther(redirectURI).build();

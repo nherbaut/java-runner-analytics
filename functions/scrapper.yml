@@ -1,0 +1,20 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:$GATEWAY_PORT
+functions:
+  scrapper:
+    lang: dockerfile
+    handler: ./scrapper
+    image: nherbaut/scrapper:latest
+    labels:
+      
+      com.openfaas.scale.min: "5"
+      com.openfaas.scale.max: "5"
+      com.openfaas.scale.factor: "20"
+      com.openfaas.scale.zero: false
+    environment:
+        read_timeout: 120s
+        write_timeout: 120s
+        write_debug: true
+
