@@ -7,6 +7,7 @@ from urllib.parse import urlparse, urlunparse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import random
+import json
 def remove_path_from_url(url):
     parsed_url = urlparse(url)
     # Reconstruct the URL without the path
@@ -33,7 +34,18 @@ opt.add_argument("--ignore-ssl-errors=yes")
 opt.add_argument("--window-size=1280,720")
 opt.add_argument("--ignore-certificate-errors")
 opt.add_argument("--disable-dev-shm-usage")
-
+opt.set_capability( "goog:loggingPrefs", {"performance": "ALL"} );
+def get_status(logs):
+    for log in logs:
+        if log['message']:
+            d = json.loads(log['message'])
+            try:
+                content_type = 'text/html' in d['message']['params']['response']['headers']['content-type']
+                response_received = d['message']['method'] == 'Network.responseReceived'
+                if content_type and response_received:
+                    return d['message']['params']['response']['status']
+            except:
+                pass
 
 
 #Load the driver
@@ -50,9 +62,9 @@ for url in sys.stdin:
             driver.get(remove_path_from_url(url))
             driver.execute_script("arguments[0].click();", first_link)
         except Exception as e:
-            print(e,file=sys.stderr)
+           pass
     except Exception as e:
-        print(e,file=sys.stderr)
+        pass
     
     
     
@@ -62,9 +74,10 @@ for url in sys.stdin:
     time_to_wait = random.randint(3, 10)
     time.sleep(time_to_wait)
     driver.get(url)
+    logs = driver.get_log('performance')
+
     driver.execute_script("window.scrollTo(0, 10000)")
     time.sleep(3)
-
 
     print(driver.page_source)
     exit()

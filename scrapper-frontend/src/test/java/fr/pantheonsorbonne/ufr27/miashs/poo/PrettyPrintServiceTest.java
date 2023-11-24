@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.ufr27.miashs.poo;
 
+import fr.pantheonsorbonne.ufr27.miashs.poo.business.PrettyPrintService;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;

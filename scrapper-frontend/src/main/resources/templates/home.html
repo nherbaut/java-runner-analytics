@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L2 MIASHS POO Project Configurator</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<h1>Projets de Programmation L2 MIASHS POO</h1>
+<h2>Choisissez une adresse</h2>
+<div class="field-container">
+    <label for="webAddress">Adresse web:</label>
+
+    <input type="text" id="webAddress" name="webAddress">
+    <input type="button" id="webAddress-checker" value="check">
+    <div class="bouncing-circle" id="pending-url-fetch" hidden></div>
+
+
+</div>
+
+<form id="dynamicForm" action="/home" method="post" hidden>
+    <h2>Quelles sont les propriétés des éléments?</h2>
+    <p>Ajoutez les noms des propriété en minuscule, sans espace</p>
+    <div id="formSections-item">
+    <button type="button" id="addSection-item" class="item">Add Section</button>
+    <button type="button" id="removeSection-item" class="item">Remove Section</button>
+
+    </div>
+    <h2>Comment allez-vous analyser la collection d'éléments?</h2>
+    <p>Ajoutez les noms des propriété retournées par l'analyse, sans espace</p>
+    <div id="formSections-items">
+        <button type="button" id="addSection-items" class="items">Add Section</button>
+        <button type="button" id="removeSection-items" class="items">Remove Section</button>
+
+    </div>
+
+    <input type="submit" value="Générer le squelette du projet">
+</form>
+
+
+<script src="assets/js/script.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package fr.pantheonsorbonne.ufr27.miashs.poo;
+package fr.pantheonsorbonne.ufr27.miashs.poo.business;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.jsoup.Jsoup;
