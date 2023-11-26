@@ -1,8 +1,5 @@
 package fr.pantheonsorbonne.ufr27.miashs.poo.business;
 
-import com.squareup.javapoet.TypeName;
-import fr.pantheonsorbonne.ufr27.miashs.poo.business.ClassGenerationService;
-import fr.pantheonsorbonne.ufr27.miashs.poo.business.WebPageSourceCodeService;
 import fr.pantheonsorbonne.ufr27.miashs.poo.model.AssignmentForm;
 import fr.pantheonsorbonne.ufr27.miashs.poo.model.FormData;
 import io.quarkus.test.junit.QuarkusTest;
@@ -11,7 +8,6 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -33,7 +29,7 @@ class ClassGenerationServiceTest {
 
         AssignmentForm assignmentForm = new AssignmentForm("url",
                 List.of(new FormData("prix", Double.class.getCanonicalName(), "item")));
-        System.out.println(cgs.generateItem(assignmentForm));
+        System.out.println(cgs.getItemJAVA(assignmentForm));
     }
 
     @Test
@@ -45,7 +41,7 @@ class ClassGenerationServiceTest {
 
         AssignmentForm assignmentForm = new AssignmentForm("url",
                 List.of(new FormData("prix", Double.class.getCanonicalName(), "item")));
-        System.out.println(cgs.generateItemsScrapper(assignmentForm));
+        System.out.println(cgs.getItemsScrapperJAVA(assignmentForm));
     }
 
     @Test
@@ -57,7 +53,7 @@ class ClassGenerationServiceTest {
 
         AssignmentForm assignmentForm = new AssignmentForm("url",
                 List.of(new FormData("prix", Double.class.getCanonicalName(), "item")));
-        System.out.println(cgs.generatePageContentConstant("url"));
+        System.out.println(cgs. getContentProxy("url"));
     }
 
     @Test
@@ -72,7 +68,7 @@ class ClassGenerationServiceTest {
                         new FormData("plusGrandprix", Double.class.getCanonicalName(), "items"),
                         new FormData("moyenneDesPrix", Double.class.getCanonicalName(), "items"),
                         new FormData("articleLeMoinsCher", String.class.getCanonicalName(), "items")));
-        System.out.println(cgs.generateItemAnalyzer(assignmentForm));
+        System.out.println(cgs.getItemsAnalyzerJAVA(assignmentForm));
     }
 
     @Test

@@ -8,8 +8,6 @@ import jakarta.inject.Inject;
 import wtf.metio.javapoet.TypeGuesser;
 
 import java.io.*;
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -33,25 +31,26 @@ public class ClassGenerationService {
     @Inject
     WebPageSourceCodeService webPageSourceCodeService;
 
-    public String generatePageContentConstant(String url) throws IOException {
+    public String getContentProxy(String url) throws IOException {
         FieldSpec constant1 = FieldSpec.builder(String.class, "CACHED_FILE_PATH", Modifier.FINAL, Modifier.PUBLIC, Modifier.STATIC).initializer("$S", "src/main/resources/scrapped0.txt").build();
         FieldSpec constant2 = FieldSpec.builder(String.class, REMOTE_URL, Modifier.FINAL, Modifier.PUBLIC, Modifier.STATIC).initializer("$S", url.trim()).build();
 
         ClassName webPageFetcher = ClassName.get(FR_PANTHEONSORBONNE_UFR_27_MIASHS_POO, "WebPageFetcher");
         MethodSpec getCached = MethodSpec.methodBuilder("getCached")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-
-
+                .addException(IOException.class)
                 .beginControlFlow("try($T reader = new $T(new $T(new $T($L),$S)))", BufferedReader.class, BufferedReader.class, InputStreamReader.class, FileInputStream.class, constant1.name,"UTF-8")
                 .addStatement("return reader.lines().collect($T.joining($S))", Collectors.class, "\n")
                 .nextControlFlow("catch($T ie)", IOException.class)
                 .addStatement("throw new $T(ie)", RuntimeException.class)
                 .endControlFlow()
                 .returns(String.class).build();
-        MethodSpec getFresh = MethodSpec.methodBuilder("getFresh").addModifiers(Modifier.PUBLIC, Modifier.STATIC).returns(String.class)
-                .addStatement("var webPageFetcher = new $T()", webPageFetcher)
-                .addStatement("var res = webPageFetcher.getFreshContent($L)", constant2.name)
-                .addStatement("return res").build();
+        MethodSpec getFresh = MethodSpec.methodBuilder("getFresh")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(String.class)
+                .addException(IOException.class)
+                .addStatement("return $T.fetchResource($L)",webPageFetcher,REMOTE_URL)
+                .build();
 
         TypeSpec.Builder itemScrapperBuilder = TypeSpec.classBuilder(CONTENT_PROXY)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
@@ -98,7 +97,7 @@ public class ClassGenerationService {
     }
 
 
-    public String generateItemsScrapper(AssignmentForm assignmentForm) throws IOException {
+    public String getItemsScrapperJAVA(AssignmentForm assignmentForm) throws IOException {
 
         ClassName itemClass = ClassName.get("fr.pantheonsorbonne.ufr27.miashs.poo", "Item");
 
@@ -132,7 +131,7 @@ public class ClassGenerationService {
 
     }
 
-    public String generateItem(AssignmentForm assignmentForm) throws IOException {
+    public String getItemJAVA(AssignmentForm assignmentForm) throws IOException {
 
 
         TypeSpec.Builder itemScrapperBuilder = TypeSpec.classBuilder(ITEM)
@@ -163,7 +162,7 @@ public class ClassGenerationService {
     }
 
 
-    public String generateItemAnalyzer(AssignmentForm data) throws IOException {
+    public String getItemsAnalyzerJAVA(AssignmentForm data) throws IOException {
         var typeSpec = TypeSpec.classBuilder("ItemAnalyzer").addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         var className = ClassName.get(FR_PANTHEONSORBONNE_UFR_27_MIASHS_POO, "Item");
 

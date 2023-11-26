@@ -11,6 +11,8 @@ public class PrettyPrintService {
         Document doc = Jsoup.parse( content);
         doc.getElementsByTag("script").remove();
         doc.getElementsByTag("style").remove();
+        doc.getElementsByTag("link").remove();
+        doc.getElementsByTag("svg").remove();
         return doc.toString();
     }
 }
