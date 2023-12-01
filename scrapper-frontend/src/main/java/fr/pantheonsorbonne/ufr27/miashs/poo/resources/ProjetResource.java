@@ -14,6 +14,8 @@ import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Path("/projects")
 public class ProjetResource {
@@ -60,7 +62,7 @@ public class ProjetResource {
             }
         });
 
-        return projets.data("projects", projetList);
+        return projets.data("projects", projetList.stream().collect(Collectors.groupingBy(Projet::getWebsite)));
     }
 
 }

@@ -12,7 +12,8 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">L2 MIASHS POO / UP1PS</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -29,26 +30,29 @@
             <li class="nav-item">
                 <a class="nav-link" href="https://java.l2.miage.dev/" target="_blank">Cours</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://mediatheque.univ-paris1.fr/video/3706-projet-de-programmation-l2-miashs-poo/" target="_blank">Instructions (Video)</a>
+            </li>
         </ul>
     </div>
 </nav>
 
 <h1 class="mb-4">Projets de Programmation L2 MIASHS POO</h1>
 <div class="mb-3">
-    <p>Il vous est demandé, pour ce projet, de choisir un site web de type "e-commerce". Choisissez une page présentant
-        un
-        grand nombre de produits ayant des caractéristiques communes.
-        Pour chaque produit, vous devrez extraire les informations du code source de la page (1) puis analyser les
-        informations extaites des produits (2).</p>
+    <p>Il vous est demandé, pour ce projet, de choisir un site web de type "e-commerce" ou tout autre site qui montre une collections d'éléments (Items) ayant des caractéristiques communes.
+        Choisissez une page présentant un grand nombre d'Items.
+        Pour chaque Item, vous devrez extraire les informations du code source de la page (1) puis analyser les
+        informations extaites de la collection d'Items (2).</p>
     <p>pour vous aider à coder, utilisez ce site pour générer le squelette du projet.
     <ul>
         <li>Choissez un site, puis vérifiez que les données peuvent être extraites en remplissant le champ "adresse",
-            validant que les données sont correctement extraites dans le nouvel onglet </li>
-        <li>Choisissez les propriété des éléments à extraire (prix, poid, couleur, en promotion, marque, description...)
+            validant que les données sont correctement extraites dans le nouvel onglet
         </li>
-        <li> choissiez les connaissances que vous voulez extraire des produits (moyenne des prix, marque la plus
-            fréquence,
-            couple de mot de plus fréquent dans la description...
+        <li>Choisissez les propriétés des Items à extraire (prix, poids, couleur, en promotion, marque,
+            description...)
+        </li>
+        <li> choissiez les connaissances que vous voulez extraire de la collection Items extraite (moyenne des prix, marque la plus
+            fréquente, couple de mot de plus fréquent dans la description...)
         </li>
         <li>Téléchargez le projet, ouvrez-le avec VS code. Codez dans les classes ItemAnalyzer et ItemsScrapper et
             exécutez toutes opérations avec la classe Main
@@ -59,9 +63,10 @@
 <h2 class="mb-3">Choisissez une adresse</h2>
 <div class="mb-3">
     <label for="webAddress" class="form-label">Adresse web:</label>
+
     <input type="text" id="webAddress" name="webAddress" class="form-control">
     <div class="d-flex gap-2 mt-2">
-        <button class="btn btn-primary" id="webAddress-checker">Check</button>
+        <button class="btn btn-primary" id="webAddress-checker">Check (vous devez autoriser les pop-ups pour ce site)</button>
         <div class="spinner-border" id="pending-url-fetch" role="status" hidden></div>
         <button class="btn btn-success" id="confirm-url-ok" hidden>Le site semble ok!</button>
         <button class="btn btn-danger" id="confirm-url-ko" hidden>Je vais en essayer un autre...</button>
@@ -73,15 +78,26 @@
 </div>
 
 <form id="dynamicForm" action="/home" method="post" hidden>
-    <h2>Quelles sont les propriétés des éléments?</h2>
-    <p>Ajoutez les noms des propriétés (entre 3 et 50 lettres CamelCase) </p>
+    <h2>Quels sont les attributs des Items?</h2>
+    <blockquote class="blockquote">
+        <p>Ajoutez les noms et types des attributs des Items(entre 3 et 50 lettres CamelCase, sans espace, sans accent, tous
+            uniques) </p>
+        <p>Au moins 5 attributs différent pour les Items</p>
+        <p>(prix, poids, couleur, en promotion, marque, description...)</p>
+    </blockquote>
     <div id="formSections-item" class="mb-3">
         <button type="button" id="addSection-item" class="btn btn-primary item">Ajouter un élément</button>
         <button type="button" id="removeSection-item" class="btn btn-danger item">Supprimer un élément</button>
     </div>
 
-    <h2>Comment allez-vous analyser la collection d'éléments?</h2>
-    <p>Ajoutez les noms des propriété retournées par l'analyse (entre 3 et 50 lettre CamelCase)</p>
+    <h2>Comment allez-vous analyser la collection d'Items?</h2>
+    <blockquote class="blockquote">
+        <p>Ajoutez les noms et types des informations retournées par l'analyse (entre 3 et 50 lettre CamelCase, sans espace,
+            sans accent, tous uniques)</p>
+        <p>Au moins 5 métriques d'analyse</p>
+        <p>(moyenne des prix, marque la plus fréquente, couple de mot de plus fréquent dans la description...)</p>
+    </blockquote>
+
     <div id="formSections-items" class="mb-3">
         <button type="button" id="addSection-items" class="btn btn-primary items">Ajouter un élément</button>
         <button type="button" id="removeSection-items" class="btn btn-danger items">Supprimer un élément
@@ -100,7 +116,8 @@
             <option value="visitor">Visiteur</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Générer le squelette du projet et réserver ce site pour ce groupe</button>
+    <button type="submit" class="btn btn-primary">Générer le squelette du projet et réserver ce site pour ce groupe
+    </button>
 </form>
 
 <!-- Include Bootstrap JS bundle -->

@@ -1,0 +1,46 @@
+form {
+    margin: 20px;
+}
+
+.section {
+    margin-bottom: 15px;
+}
+
+.invalid {
+    border: 2px solid red;
+}
+
+.valid {
+    border: 2px solid green;
+}
+.bouncing-circle {
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    border-radius: 50%;
+    animation:
+            4s linear 0s infinite alternate rise,
+            4s linear 0s infinite alternate bounce;
+}
+.project-detail:not(:last-child) {
+    display: none;
+}
+.old-skeletton{
+    background-color: beige;
+}
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-200px);
+    }
+}
+
+@keyframes changeColor {
+    0% { background-color: red; }
+    25% { background-color: blue; }
+    50% { background-color: green; }
+    75% { background-color: yellow; }
+    100% { background-color: red; }
+}

@@ -34,18 +34,57 @@
 
 <h1 class="mb-4">Projets enregistrés</h1>
 
-{#for project in projects }
-<h2>{project.website}</h2>
-    <ul><li>Auteurs: {project.names}</li>
-    <li>Groupe de TD: {project.groups}</li>
-    <li>Adresse: {project.realAssignment}</li>
-    <li>Réservé le: {project.creationTime}</li>
-    <li><a href="/projects/{project.id}">Télécharger le squelette</a></li>
-    </ul>
-{/for}
+<div class="container mt-4">
+    {#for project in projects.keySet()}
+        <div class="card mb-3">
+        <div class="card-header">
+            <h2 class="h5 mb-0 d-inline">{project}</h2>
+
+        </div>
+        <ul class="list-group list-group-flush">
+        {#for projetInstance in projects.get(project)}
+            <li class="list-group-item project-detail" >
+            <strong>Auteurs:</strong> {projetInstance.names}<br>
+            <strong>Groupe de TD:</strong> {projetInstance.groups}<br>
+            <strong>Adresse:</strong> {projetInstance.realAssignment}<br>
+            <strong>Réservé le:</strong> {projetInstance.creationTime}<br>
+            <a href="/projects/{projetInstance.id}" class="btn btn-primary btn-sm mt-2">Télécharger le squelette</a>
+            </li>
+        {/for}
+        </ul>
+        </div>
+    {/for}
+</div>
+
+
 
 <!-- Include Bootstrap JS bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.card').forEach(card => {
+            const projectDetails = card.querySelectorAll('.project-detail');
+            if (projectDetails.length > 1) {
+                const header = card.querySelector('.card-header');
+                const button = document.createElement('button');
+                button.className = 'btn btn-sm btn-outline-secondary float-right toggle-button';
+                button.textContent = 'Montrer les anciens squelettes';
+                header.appendChild(button);
+
+                button.addEventListener('click', function() {
+                    projectDetails.forEach((detail, index) => {
+                        if (index < projectDetails.length - 1) {
+                            detail.style.display = detail.style.display !='block' ? 'block': 'none';
+                            detail.classList.add("old-skeletton")
+                        }
+                    });
+                    this.textContent = this.textContent === 'Montrer les anciens squelettes' ? 'Montrer les anciens squelettes' : 'Montrer les anciens squelettes';
+                });
+            }
+        });
+    });
+
+</script>
 </html>
