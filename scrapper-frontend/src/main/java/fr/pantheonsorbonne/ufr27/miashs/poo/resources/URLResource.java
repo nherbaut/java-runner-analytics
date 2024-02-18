@@ -29,7 +29,7 @@ public class URLResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response getScrappedContent(@PathParam("base64URL") String base64) {
-        String decodedURL = new String(Base64.getUrlDecoder().decode(base64));
+        String decodedURL = new String(Base64.getUrlDecoder().decode(base64.replace("%2f","/")));
         String ownerInfo = null;
         try {
             ownerInfo = projectService.getProjectOwnerInfo(decodedURL);
@@ -57,7 +57,7 @@ public class URLResource {
         try {
 
 
-            var responseBuilder = Response.seeOther(new URI(serverURI + "url/" + Base64.getUrlEncoder().encodeToString(url.getBytes())));
+            var responseBuilder = Response.seeOther(new URI(serverURI + "url/" + Base64.getUrlEncoder().encodeToString(url.getBytes()).replace("/","%2f")));
 
             return responseBuilder.build();
         } catch (URISyntaxException e) {
