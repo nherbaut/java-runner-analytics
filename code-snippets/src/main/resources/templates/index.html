@@ -14,39 +14,27 @@
 <div class="bg-light p-5 rounded-lg m-3">
 
     <h1>Your Snippets</h1>
-    <ul class="list-group" id="snippets"></ul>
+    <ul class="list-group" id="snippets">
+        {#for snippet in snippets}
+            <li class="list-group-item">
+                <a href="/snippet/{snippet.id}">{snippet.title} (by {snippet.owner})</a>
+                <a href="#" class="fa-solid fa-trash snip-action fa-xl snip-delete" data-id="{snippet.id}"></a>
+                <a href="https://java.miage.dev/?snipId={snippet.id}"
+                   class="fa-solid fa-play snip-action fa-xl fa-shake snip-play"></a>
+                {#if snippet.declareNeedHelp}
+                    <i class="fa-solid fa-hand-holding-hand"></i>
+                {/if}
+            </li>
+        {/for}
+    </ul>
+
     <h1>Create New Snippet</h1>
     <form id="snippet" class="m-0 border-0">
-        <div class="mb-3">
-            <label for="title" class="form-label">Email address</label>
-            <input type="text" id="title" value="title" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="fileName" class="form-label">File Name</label>
-            <input type="text" id="fileName" value="fileName" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="fileContent" class="form-label">File Content</label>
-            <textarea id="fileContent" class="form-control"></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="comment" class="form-label">Comment</label>
-            <input type="text" id="comment" class="form-control"/>
-        </div>
+        {#include snippet-form.html /}
+    <div class="btn-group mr-2" role="group" aria-label="First group">
+        <input value="Save Snippet" type="submit" id="formSubmit" class="form-control btn btn-primary"/>
+    </div>
 
-        <div class="mb-3">
-            <h2>Metadata</h2>
-            <a href="#" id="add-meta" class="fa-solid fa-plus fa-xl"></a>
-
-            <div class="row" id="meta-container">
-
-            </div>
-
-        </div>
-
-        <div class="mb-3">
-            <input type="submit" id="formSubmit" class="form-control"/>
-        </div>
 
     </form>
 </div>
@@ -54,86 +42,35 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
+    {#include snippet-js.html /}
 <script type="module">
     import {
-        snippet_auth,
-        getMySnippets,
-        delSnippet,
         createSnippet,
         createFile,
         createComment,
-        createMeta
-
     } from "{codeSnippetApiURL}/js/snippet.js"
 
+
     import {
-        createNewMetaForm,
         extractMetas
 
     } from "{codeSnippetApiURL}/js/script.js"
 
-    snippet_auth("{codeSnippetApiURL}");
+    import{
+        createNewFileInput
+    } from "{codeSnippetApiURL}/js/snippet-ui.js"
 
+    createNewFileInput();
 
-    let snippetPane = document.getElementById("snippets");
-    {#for snippet in snippets}
-    {
-        let li = document.createElement("li");
-        li.classList.add("list-group-item");
-        let a = document.createElement("a");
-        let delSnip = document.createElement("a");
-        delSnip.href = "#";
-        delSnip.classList.add("fa-solid", "fa-trash", "snip-action", "fa-xl", "snip-delete");
-        delSnip.addEventListener("click", () => {
-            delSnippet("{snippet.id}").then(deleted => {
-                if (deleted) li.remove();
-            })
-
-        });
-
-        let run = document.createElement("a");
-        run.href = "#";
-        run.classList.add("fa-solid", "fa-play", "snip-action", "fa-xl", "fa-shake", "snip-play");
-
-        run.addEventListener("click", () => {
-            window.location = "https://java.miage.dev/?snipId=" + "{snippet.id}";
-        });
-
-
-        a.href = "/snippet/" + "{snippet.id}";
-        a.innerHTML = "{snippet.title}" + " (by " + "{snippet.owner}" + ")";
-        li.appendChild(a);
-        li.appendChild(delSnip);
-        li.appendChild(run);
-
-        {#if snippet.declareNeedHelp}
-        let help = document.createElement("i");
-        help.classList.add("fa-solid", "fa-hand-holding-hand");
-        li.appendChild(help);
-
-        {/if}
-
-        snippetPane.appendChild(li);
-
-
-    }
-    {/for}
-    document.getElementById("add-meta").addEventListener("click", function (evt) {
-        evt.preventDefault();
-        let metaContainer = document.getElementById("meta-container");
-        createNewMetaForm(metaContainer);
-
-
-    });
-
-
+    // Handle form submission
     document.getElementById("snippet").addEventListener("submit", function (evt) {
         evt.preventDefault();
         let title = document.getElementById("title").value;
-        let fileName = document.getElementById("fileName").value;
-        let fileContent = document.getElementById("fileContent").value;
+        let fileNames = Array.from(document.getElementsByName("fileName[]")).map(input => input.value);
+        let fileContents = Array.from(document.getElementsByName("fileContent[]")).map(input => input.value);
         let comment = document.getElementById("comment").value;
-        let files = [createFile(fileName, fileContent)];
+
+        let files = fileNames.map((name, index) => createFile(name, fileContents[index]));
         let comments = [createComment(comment)];
 
         let metacontainer = document.getElementById("meta-container");
@@ -144,11 +81,9 @@
                 console.log(response);
                 location.reload();
             } else {
-                alert("something when wrong " + response.blob());
+                alert("something went wrong " + response.blob());
             }
         });
     });
-
-
 </script>
 </html>

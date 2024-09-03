@@ -1,8 +1,6 @@
 package fr.pantheonsorbonne.ufr27.miage.resources;
 
-import fr.pantheonsorbonne.ufr27.miage.model.Comment;
-import fr.pantheonsorbonne.ufr27.miage.model.File;
-import fr.pantheonsorbonne.ufr27.miage.model.Meta;
+
 import fr.pantheonsorbonne.ufr27.miage.model.Snippet;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.qute.CheckedTemplate;
@@ -12,14 +10,13 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
-import org.apache.http.client.utils.URIBuilder;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
+
 
 @Path("snippet")
 public class CodeSnippetResource {
@@ -98,7 +95,7 @@ public class CodeSnippetResource {
     public Response postSnippet(Snippet snippet, @Context SecurityContext ctx) {
         snippet.owner = ctx.getUserPrincipal().getName();
         snippet.lastTouchedTime = Instant.now();
-        Snippet.persist(snippet);
+               Snippet.persist(snippet);
 
         return Response.created(UriBuilder.fromUri(codeSnippetApiURL).path("snippet").path(snippet.id).build()).build();
     }

@@ -9,6 +9,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.Instant;
+
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class File extends PanacheEntityBase {

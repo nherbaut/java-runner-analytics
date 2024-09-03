@@ -1,0 +1,61 @@
+<script type="module">
+    import {
+        snippet_auth,
+        delSnippet,
+        createSnippet,
+        createFile,
+        createComment,
+    } from "{codeSnippetApiURL}/js/snippet.js"
+
+
+    import {
+        createNewMetaForm,
+        extractMetas
+
+    } from "{codeSnippetApiURL}/js/script.js"
+
+    import{
+        createNewFileInput
+    } from "{codeSnippetApiURL}/js/snippet-ui.js"
+
+    snippet_auth("{codeSnippetApiURL}");
+
+    // Handle snippet deletion
+    document.querySelectorAll(".snip-delete").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            const snippetId = this.getAttribute("data-id");
+            delSnippet(snippetId).then(deleted => {
+                if (deleted) {
+                    this.closest("li").remove();
+                }
+            });
+        });
+    });
+
+
+
+    // Add new file input fields
+    document.getElementById("add-file").addEventListener("click", function () {
+        createNewFileInput();
+    });
+
+
+
+    // Handle the initial delete buttons
+    document.querySelectorAll(".delete-file").forEach(button => {
+        button.addEventListener("click", function () {
+            this.closest(".file-entry").remove();
+        });
+    });
+
+    // Handle metadata addition
+    document.getElementById("add-meta").addEventListener("click", function (evt) {
+        evt.preventDefault();
+        let metaContainer = document.getElementById("meta-container");
+        createNewMetaForm(metaContainer);
+    });
+
+
+
+</script>

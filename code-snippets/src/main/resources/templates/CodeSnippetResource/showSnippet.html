@@ -8,45 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
           integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/style.css">
 
 </head>
 <body>
 <div class="bg-light p-5 rounded-lg m-3">
 
-    <h1>{snippet.title}</h1>
+    <h1>Snippet</h1>
     <form id="snippet" class="m-0 border-0">
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" id="title" value="{snippet.title}" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="fileName" class="form-label">File Name</label>
-            <input type="text" id="fileName" value="{snippet.files.get(0).name}" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="fileContent" class="form-label">File Content</label>
-            <textarea id="fileContent" class="form-control">{snippet.files.get(0).content}</textarea>
-        </div>
-
-        {#if snippet.comments.size > 0}
-            <div class="mb-3">
-            <label for="comment" class="form-label">Comment</label>
-            <input type="text" id="comment" class="form-control" value="{snippet.comments.get(0).content}"/>
-            </div>
-        {/if}
+            {#include snippet-form.html /}
 
         <div class="mb-3">
-            <h2>Metadata</h2>
-            <a href="#" id="add-meta" class="fa-solid fa-plus fa-xl"></a>
-
-            <div class="row" id="meta-container">
-
-            </div>
-
-        </div>
-
-
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 
                 <div class="btn-group mr-2" role="group" aria-label="First group">
@@ -55,71 +27,58 @@
                 </div>
 
                 {#if canEdit }
-                <div class="btn-group mr-2" role="group" aria-label="Second group">
-                    <input type="submit" id="formSubmit" class="form-control btn btn-primary" value="Save"/>
-                    <input type="button" id="my-snips" class="form-control btn btn-secondary" value="Show Mine"/>
-                    <input type="button" id="del-snip" class="form-control btn btn-danger" value="Delete"/>
-                </div>
+                    <div class="btn-group mr-2" role="group" aria-label="Second group">
+                        <input type="submit" id="formSubmit" class="form-control btn btn-primary" value="Save"/>
+                        <input type="button" id="my-snips" class="form-control btn btn-secondary" value="Show Mine"/>
+                        <input type="button" id="del-snip" class="form-control btn btn-danger" value="Delete"/>
+                    </div>
                 {/if}
 
             </div>
-
-
-
-
-
-
-
-
+        </div>
     </form>
 </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
+    {#include snippet-js.html /}
+
 <script type="module">
     import {
+        createNewFileInput
+    } from "{codeSnippetApiURL}/js/snippet-ui.js"
+
+    import {
         snippet_auth,
+        getMySnippets,
         delSnippet,
+        createSnippet,
         createFile,
         createComment,
+        getSnippet,
         updateSnippet,
         createMeta
     } from "{codeSnippetApiURL}/js/snippet.js"
 
     import {
-        createNewMetaForm,
-        extractMetas
+        createNewMetaForm, extractMetas
+    }
+        from "{codeSnippetApiURL}/js/script.js"
 
-    } from "{codeSnippetApiURL}/js/script.js"
-
-
-    var changed = false;
-    for (let elt of document.querySelectorAll("input, textarea")) {
-        elt.addEventListener("change", function () {
-            changed = true;
-        })
-    };
-    let metaContainer = document.getElementById("meta-container");
-
-    {#for meta in snippet.metas}
-        createNewMetaForm(metaContainer,"{meta.key}","{meta.value}");
-    {/for}
-
-    snippet_auth("{codeSnippetApiURL}");
     document.getElementById("snippet").addEventListener("submit", function (evt) {
         evt.preventDefault();
         let title = document.getElementById("title").value;
-        let fileName = document.getElementById("fileName").value;
-        let fileContent = document.getElementById("fileContent").value;
+        let fileNames = Array.from(document.getElementsByName("fileName[]")).map(input => input.value);
+        let fileContents = Array.from(document.getElementsByName("fileContent[]")).map(input => input.value);
         let comment = "";
-        if (document.getElementById("comment") != undefined) {
+        if (document.getElementById("comment") !== undefined) {
             comment = document.getElementById("comment").value;
         }
 
 
 
-        let files = [createFile(fileName, fileContent)];
+        let files = fileNames.map((name, index) => createFile(name, fileContents[index]));
         let comments = [createComment(comment)];
         let metacontainer = document.getElementById("meta-container");
         let metas = extractMetas(metacontainer);
@@ -132,6 +91,32 @@
             }
         });
     });
+
+    document.getElementById("title").value = "{snippet.title}";
+    {#for file in snippet.files}
+    createNewFileInput(`{file.name}`, `{file.content}`);
+    {/for}
+
+    {#for meta in snippet.metas}
+    createNewMetaForm(document.getElementById("meta-container"),"{meta.key}", "{meta.value}");
+    {/for}
+
+
+</script>
+<script type="module">
+
+    import {
+        delSnippet,
+
+    } from "{codeSnippetApiURL}/js/snippet.js"
+
+
+
+    var changed = false;
+
+    document.querySelectorAll("input").forEach(i => i.addEventListener("change", function () {
+        changed = true;
+    }));
 
     document.getElementById("del-snip").addEventListener("click", function () {
         let confirm = window.confirm("are your sure you want to remove this snippet?");
@@ -158,12 +143,6 @@
         }
     });
 
-    document.getElementById("add-meta").addEventListener("click", function (evt) {
-        evt.preventDefault();
-        let metaContainer = document.getElementById("meta-container");
-        createNewMetaForm(metaContainer);
 
-
-    });
 </script>
 </html>

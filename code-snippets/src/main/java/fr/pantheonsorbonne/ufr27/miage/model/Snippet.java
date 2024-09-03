@@ -1,14 +1,13 @@
 package fr.pantheonsorbonne.ufr27.miage.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import io.quarkus.hibernate.orm.panache.*;
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,10 +24,13 @@ public class Snippet extends PanacheEntityBase {
 
 
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("name")
     public List<File> files;
     @OneToMany(cascade = CascadeType.ALL)
     public List<Comment> comments;
 
+
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("key")
     public List<Meta> metas;
 }
