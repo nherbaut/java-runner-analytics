@@ -141,7 +141,7 @@ public class CodeSnippetResource {
                 throw new WebApplicationException(403);
             }
         }
-        return Response.noContent().header("Location", UriBuilder.fromUri(codeSnippetApiURL).path("snippet").path(snippet.id).build()).build();
+        return Response.noContent().header("Location", UriBuilder.fromUri(codeSnippetApiURL).path("snippet").path(snippetId).build()).build();
 
     }
 

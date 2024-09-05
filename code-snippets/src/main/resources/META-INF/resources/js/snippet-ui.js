@@ -1,3 +1,7 @@
+
+
+
+
 function createNewFileInput(fileName = "", fileContent = "") {
 
         const fileContainer = document.getElementById("files-container");
@@ -23,7 +27,11 @@ function createNewFileInput(fileName = "", fileContent = "") {
             newFileEntry.remove();
         });
 
+
+
 }
+
+
 
 export {
     createNewFileInput

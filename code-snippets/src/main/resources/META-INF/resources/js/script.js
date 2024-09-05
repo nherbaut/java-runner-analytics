@@ -2,6 +2,7 @@ import {
     createMeta
 } from "/js/snippet.js"
 
+
 function createNewMetaForm(metaContainer, key, value) {
     let metaDiv = document.createElement("div");
     let metaKeyInput = document.createElement("input");
@@ -11,6 +12,7 @@ function createNewMetaForm(metaContainer, key, value) {
     let metadataDeleteInput = document.createElement("input");
 
 
+    metaDiv.classList.add("meta-card");
     metaKeyLabel.innerText = "Key";
     metaValueLabel.innerText = "Value";
     metaKeyInput.type = "text";
@@ -31,25 +33,47 @@ function createNewMetaForm(metaContainer, key, value) {
     metadataDeleteInput.addEventListener("click", function () {
         metaDiv.remove();
     });
-    if (key != undefined) {
+    if (key !== undefined) {
         metaKeyInput.value = key;
     }
-    if (value != undefined) {
+    if (value !== undefined) {
         metaValueInput.value = value;
     }
+
+    fetch("http://localhost:8081/meta/keys").then(r => r.json()).then(suggestions =>
+        new Awesomplete(metaKeyInput, {
+            list: suggestions
+        }));
+
+    let keyAutocomplete = new Awesomplete(metaValueInput, {
+        list: []
+    });
+
+    metaKeyInput.addEventListener("focusout", function () {
+        console.log("focusout");
+        fetch("http://localhost:8081/meta/values?key=" + metaKeyInput.value).then(r => r.json()).then(suggestions => {
+            keyAutocomplete.list = suggestions;
+        })
+    });
+
+
 }
 
 function extractMetas(metacontainer) {
-    let metas = [];
-    for (let meta of metacontainer.children) {
-        let inputForThisMeta = meta.querySelectorAll(":scope > input");
+    const metas = [];
+    const metaCards = metacontainer.querySelectorAll('.meta-card');
+
+// Loop through each meta-card and select the nested inputs
+    metaCards.forEach((metaCard) => {
+        const inputForThisMeta = metaCard.querySelectorAll('input.form-control');  // This will select all inputs inside the meta-card
         let key = inputForThisMeta[0].value;
         let value = inputForThisMeta[1].value;
         metas.push(createMeta(key, value));
-    }
+    });
+
+
     return metas;
 }
-
 
 
 export {createNewMetaForm, extractMetas}
