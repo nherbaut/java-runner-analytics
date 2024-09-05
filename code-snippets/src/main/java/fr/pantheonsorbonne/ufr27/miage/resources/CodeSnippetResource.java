@@ -2,11 +2,13 @@ package fr.pantheonsorbonne.ufr27.miage.resources;
 
 
 import fr.pantheonsorbonne.ufr27.miage.model.Snippet;
+import fr.pantheonsorbonne.ufr27.miage.service.SnippetService;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.PermitAll;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -14,8 +16,11 @@ import jakarta.ws.rs.core.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Path("snippet")
@@ -72,6 +77,20 @@ public class CodeSnippetResource {
         }
     }
 
+    @Inject
+    SnippetService snippetService;
+
+    @Path("search")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @PermitAll
+    public Collection<Snippet> searchSnippet(@QueryParam("query") String query) {
+        query = Objects.requireNonNullElse(query, "");
+        Map<String, String> metaSearch = Arrays.stream(query.split(",")).collect(Collectors.toMap(s -> s.split(":")[0], s -> s.split(":")[1]));
+        return snippetService.searchSnippets(metaSearch);
+
+    }
+
     @Path("{snippetId}")
     @Produces(MediaType.TEXT_HTML)
     @GET
@@ -95,7 +114,7 @@ public class CodeSnippetResource {
     public Response postSnippet(Snippet snippet, @Context SecurityContext ctx) {
         snippet.owner = ctx.getUserPrincipal().getName();
         snippet.lastTouchedTime = Instant.now();
-               Snippet.persist(snippet);
+        Snippet.persist(snippet);
 
         return Response.created(UriBuilder.fromUri(codeSnippetApiURL).path("snippet").path(snippet.id).build()).build();
     }
@@ -113,16 +132,16 @@ public class CodeSnippetResource {
             throw new WebApplicationException(404);
         } else {
             if (Objects.equals(snippetDB.owner, ctx.getUserPrincipal().getName()) || ctx.isUserInRole("helpers")) {
-                snippetDB.title = snippet.title!=null? snippet.title : snippetDB.title;
-                snippetDB.files = snippet.files!=null? snippet.files : snippetDB.files;
-                snippetDB.comments = snippet.comments!=null? snippet.comments : snippetDB.comments;
-                snippetDB.metas = snippet.metas!=null? snippet.metas : snippetDB.metas;
+                snippetDB.title = snippet.title != null ? snippet.title : snippetDB.title;
+                snippetDB.files = snippet.files != null ? snippet.files : snippetDB.files;
+                snippetDB.comments = snippet.comments != null ? snippet.comments : snippetDB.comments;
+                snippetDB.metas = snippet.metas != null ? snippet.metas : snippetDB.metas;
                 snippetDB.lastTouchedTime = Instant.now();
             } else {
                 throw new WebApplicationException(403);
             }
         }
-        return Response.noContent().build();
+        return Response.noContent().header("Location", UriBuilder.fromUri(codeSnippetApiURL).path("snippet").path(snippet.id).build()).build();
 
     }
 

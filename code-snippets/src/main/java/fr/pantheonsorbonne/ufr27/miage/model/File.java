@@ -23,4 +23,6 @@ public class File extends PanacheEntityBase {
     public String name;
     @Column(length = 16_777_216)
     public String content;
+
+    public FileType filetype = FileType.MAIN_CODE;
 }

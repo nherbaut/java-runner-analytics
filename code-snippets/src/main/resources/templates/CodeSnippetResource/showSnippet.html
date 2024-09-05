@@ -77,7 +77,6 @@
         }
 
 
-
         let files = fileNames.map((name, index) => createFile(name, fileContents[index]));
         let comments = [createComment(comment)];
         let metacontainer = document.getElementById("meta-container");
@@ -98,7 +97,11 @@
     {/for}
 
     {#for meta in snippet.metas}
-    createNewMetaForm(document.getElementById("meta-container"),"{meta.key}", "{meta.value}");
+    createNewMetaForm(document.getElementById("meta-container"), "{meta.key}", "{meta.value}");
+    {/for}
+
+    {#for comment in snippet.comments}
+    document.getElementById("comment").value="{comment.content}"
     {/for}
 
 
@@ -111,25 +114,28 @@
     } from "{codeSnippetApiURL}/js/snippet.js"
 
 
-
     var changed = false;
 
     document.querySelectorAll("input").forEach(i => i.addEventListener("change", function () {
         changed = true;
     }));
 
-    document.getElementById("del-snip").addEventListener("click", function () {
-        let confirm = window.confirm("are your sure you want to remove this snippet?");
-        if (confirm) {
-            delSnippet("{snippet.id}").then(() => window.location = "/user/me");
-        }
-    });
+    if (document.getElementById("del-snip")) {
+        document.getElementById("del-snip").addEventListener("click", function () {
+            let confirm = window.confirm("are your sure you want to remove this snippet?");
+            if (confirm) {
+                delSnippet("{snippet.id}").then(() => window.location = "/user/me");
+            }
+        });
+    }
 
-    document.getElementById("my-snips").addEventListener("click", function () {
-        if (!changed || window.confirm("drop changes to this snippet?")) {
-            window.location = "/user/me";
-        }
-    });
+    if (document.getElementById("my-snips")) {
+        document.getElementById("my-snips").addEventListener("click", function () {
+            if (!changed || window.confirm("drop changes to this snippet?")) {
+                window.location = "/user/me";
+            }
+        });
+    }
 
     document.getElementById("run-snip").addEventListener("click", function () {
         if (!changed || window.confirm("Discard unsaved Changes?")) {
