@@ -3,7 +3,7 @@ import {
 } from "/js/snippet.js"
 
 
-function createNewMetaForm(metaContainer, key, value) {
+function createNewMetaForm(codeSnippetApiURL,metaContainer, key, value) {
     let metaDiv = document.createElement("div");
     let metaKeyInput = document.createElement("input");
     let metaValueInput = document.createElement("input");
@@ -40,7 +40,7 @@ function createNewMetaForm(metaContainer, key, value) {
         metaValueInput.value = value;
     }
 
-    fetch("http://localhost:8081/meta/keys").then(r => r.json()).then(suggestions =>
+    fetch(codeSnippetApiURL+"/meta/keys").then(r => r.json()).then(suggestions =>
         new Awesomplete(metaKeyInput, {
             list: suggestions
         }));
@@ -51,7 +51,7 @@ function createNewMetaForm(metaContainer, key, value) {
 
     metaKeyInput.addEventListener("focusout", function () {
         console.log("focusout");
-        fetch("http://localhost:8081/meta/values?key=" + metaKeyInput.value).then(r => r.json()).then(suggestions => {
+        fetch(codeSnippetApiURL+"/meta/values?key=" + metaKeyInput.value).then(r => r.json()).then(suggestions => {
             keyAutocomplete.list = suggestions;
         })
     });
