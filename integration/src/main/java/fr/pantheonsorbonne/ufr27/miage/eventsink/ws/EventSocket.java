@@ -59,8 +59,7 @@ public class EventSocket {
     Vertx vertx;
 
     @OnMessage
-    @RolesAllowed({"discord-auth", "recaptcha-cleared"})
-    @Blocking
+    @RolesAllowed({"student-events-opt-in"})
     public void onMessage(final Session session, String message) throws IOException {
 
 

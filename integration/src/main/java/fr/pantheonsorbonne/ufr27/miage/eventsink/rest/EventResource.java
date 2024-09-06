@@ -24,7 +24,7 @@ public class EventResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/")
     @POST
-    @RolesAllowed({"recaptcha-cleared", "discord-auth"})
+    @RolesAllowed({"student-events-opt-in"})
     @Consumes(MediaType.APPLICATION_JSON)
     public Uni<RestResponse<Event>> postEvent(EventDTO event) {
         return gateway.publishEvent(event).replaceWith(RestResponse.status(RestResponse.Status.CREATED));
