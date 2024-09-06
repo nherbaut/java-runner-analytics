@@ -21,15 +21,11 @@
 
     <div class="container">
         <div class="row">
-            <div class="flex items-center justify-center h-screen bg-discord-gray text-white col">
-                <button type="button" class="btn btn-primary" onclick="window.open('/discord?callback={callback}','_parent');"><span
-                            class="fa-brands fa-discord"></span> Discord (requires a Discord Account, you'll need to refresh this window after login)
-                </button>
-            </div>
+
 
             <div class="flex items-center justify-center h-screen bg-google text-white col">
-                <button type="button" class="btn btn-secondary" onclick="window.location='/anonymous?callback={callback}';"><i
-                            class="fa-brands fa-google text-2xl"></i> Anon Login (won't work in public wifi)
+                <button type="button" class="btn btn-secondary" onclick="window.location='/oidc?callback={callback}';"><i
+                            class="fa-brands fa-google text-2xl"></i> login.miage.dev
                 </button>
             </div>
         </div>

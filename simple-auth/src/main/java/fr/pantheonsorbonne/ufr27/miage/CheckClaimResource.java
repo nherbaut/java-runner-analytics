@@ -1,7 +1,10 @@
 package fr.pantheonsorbonne.ufr27.miage;
 
+import io.quarkus.oidc.UserInfo;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
+import io.quarkus.security.Authenticated;
+import io.smallrye.jwt.auth.principal.DefaultJWTCallerPrincipal;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -23,15 +26,17 @@ public class CheckClaimResource {
         public static native TemplateInstance root();
     }
 
-    @Inject
-    protected JsonWebToken jwt;
 
-    @PermitAll
+
+
+
+    @Authenticated
     @GET
     public Response getUserInfo(@Context SecurityContext context) {
         Response.ResponseBuilder builder = Response.ok();
-        builder = builder.header("preferred_name", context.getUserPrincipal().getName());
-        builder = builder.header("groups", jwt.getGroups().stream().collect(Collectors.joining(",")));
+        DefaultJWTCallerPrincipal principal = (DefaultJWTCallerPrincipal)context.getUserPrincipal();
+        builder = builder.header("preferred_name", principal.getName());
+        builder = builder.header("groups", String.join(",", principal.getGroups()));
         return builder.build();
     }
 
