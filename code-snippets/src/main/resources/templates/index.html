@@ -14,7 +14,7 @@
 <body>
 <div class="bg-light p-5 rounded-lg m-3">
 
-    <h1>Your Snippets</h1>
+    <h1>All Snippets</h1>
     <ul class="list-group" id="snippets">
         {#for snippet in snippets}
             <li class="list-group-item">
@@ -25,6 +25,10 @@
                 {#if snippet.declareNeedHelp}
                     <i class="fa-solid fa-hand-holding-hand"></i>
                 {/if}
+                {#for meta in snippet.metas}
+
+                    <span class="badge bg-secondary"> {meta.value}</span>
+                {/for}
             </li>
         {/for}
     </ul>

@@ -3,6 +3,7 @@ package fr.pantheonsorbonne.ufr27.miage.resources;
 
 import fr.pantheonsorbonne.ufr27.miage.model.Snippet;
 import fr.pantheonsorbonne.ufr27.miage.service.SnippetService;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
@@ -32,7 +33,7 @@ public class CodeSnippetResource {
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @PermitAll
-    public Collection<Snippet> getAllSnippetsPaged(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("25") @QueryParam("pageSize") int pageSize) {
+    public Collection<Snippet> getAllSnippetsPaged(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("10000") @QueryParam("pageSize") int pageSize) {
         return Snippet.findAll(Sort.descending("owner").and("lastTouchedTime")).page(pageIndex, pageSize).list();
 
     }
@@ -41,7 +42,7 @@ public class CodeSnippetResource {
     @Produces(MediaType.TEXT_HTML)
     @GET
     @PermitAll
-    public TemplateInstance getAllSnippetsPagedHTML(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("1000") @QueryParam("pageSize") int pageSize) {
+    public TemplateInstance getAllSnippetsPagedHTML(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("25") @QueryParam("pageSize") int pageSize) {
         return fr.pantheonsorbonne.ufr27.miage.resources.Templates.index(Snippet.findAll().page(pageIndex, pageSize).list(), codeSnippetApiURL);
 
     }
@@ -156,10 +157,10 @@ public class CodeSnippetResource {
         if (res == null) {
             throw new WebApplicationException(404);
         } else {
-            if (res.owner.equals(ctx.getUserPrincipal().getName())) {
-                res.files.stream().forEach(item -> item.delete());
-                res.comments.stream().forEach(item -> item.delete());
-                res.metas.stream().forEach(item -> item.delete());
+            if (res.owner.equals(ctx.getUserPrincipal().getName()) || ctx.isUserInRole("admin-java")) {
+                res.files.forEach(PanacheEntityBase::delete);
+                res.comments.forEach(PanacheEntityBase::delete);
+                res.metas.forEach(PanacheEntityBase::delete);
                 res.delete();
             } else {
                 throw new WebApplicationException(403);

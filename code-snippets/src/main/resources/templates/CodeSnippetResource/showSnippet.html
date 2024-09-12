@@ -16,7 +16,7 @@
 <div class="bg-light p-5 rounded-lg m-3">
 
     <h1>Snippet</h1>
-    <form id="snippet" class="m-0 border-0">
+    <form id="snippet" class="m-0 border-0" method="POST">
             {#include snippet-form.html /}
 
         <div class="mb-3">
@@ -29,7 +29,7 @@
 
                 {#if canEdit }
                     <div class="btn-group mr-2" role="group" aria-label="Second group">
-                        <input type="submit" id="formSubmit" class="form-control btn btn-primary" value="Save"/>
+                        <input type="button" id="formSubmit" class="form-control btn btn-primary" value="Save"/>
                         <input type="button" id="my-snips" class="form-control btn btn-secondary" value="Show Mine"/>
                         <input type="button" id="del-snip" class="form-control btn btn-danger" value="Delete"/>
                     </div>
@@ -68,7 +68,7 @@
     }
         from "{codeSnippetApiURL}/js/script.js"
 
-    document.getElementById("snippet").addEventListener("submit", function (evt) {
+    document.getElementById("formSubmit")?.addEventListener("click",  function (evt) {
         evt.preventDefault();
         let title = document.getElementById("title").value;
         let fileNames = Array.from(document.getElementsByName("fileName[]")).map(input => input.value);
@@ -99,7 +99,7 @@
     {/for}
 
     {#for meta in snippet.metas}
-    createNewMetaForm(document.getElementById("meta-container"), "{meta.key}", "{meta.value}");
+    createNewMetaForm("{codeSnippetApiURL}",document.getElementById("meta-container"), "{meta.key}", "{meta.value}");
     {/for}
 
     {#for comment in snippet.comments}
