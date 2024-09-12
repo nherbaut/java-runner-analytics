@@ -20,11 +20,15 @@ public class AuthResource {
         public static native TemplateInstance index(String callback);
     }
 
+    @ConfigProperty(name="fr.pantheonsorbonne.ufr27.miage.authuri")
+    URI authuri;
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response getHome(@QueryParam("callback") URI
-                                        callback) {
-        return Response.seeOther(UriBuilder.fromPath("/oidc").queryParam("callback", callback).build()).build();
+                                        callback,@Context UriInfo uriInfo) {
+
+        return Response.seeOther(UriBuilder.fromUri(authuri).path("oidc").queryParam("callback", callback).build()).build();
 
     }
 
