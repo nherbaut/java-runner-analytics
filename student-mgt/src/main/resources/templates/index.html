@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Sessions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var attendanceTimeouts = {};
+
+        function updateAttendance(promo, course, td, studentName, date, attendance, sanitizedStudentName) {
+            var buttons = document.querySelectorAll('.attendance-buttons-' + sanitizedStudentName + ' button');
+            buttons.forEach(function (button) {
+                button.classList.remove('btn-primary');
+                button.classList.remove('btn-light');
+                button.classList.add('btn-secondary');
+            });
+            document.getElementById('attendance-' + attendance + '-' + sanitizedStudentName).classList.remove('btn-secondary');
+            document.getElementById('attendance-' + attendance + '-' + sanitizedStudentName).classList.add('btn-light');
+
+            if (attendanceTimeouts[studentName]) {
+                clearTimeout(attendanceTimeouts[studentName]);
+            }
+
+            attendanceTimeouts[studentName] = setTimeout(function () {
+                document.getElementById('attendance-' + attendance + '-' + sanitizedStudentName).classList.add('btn-primary');
+                document.getElementById('attendance-' + attendance + '-' + sanitizedStudentName).classList.remove('btn-light');
+                fetch('/students/' + promo + '/' + course + '/' + td + '/' + studentName + '/' + date + '/attendance/' + attendance, {
+                    method: 'POST'
+                }).then(function (response) {
+
+                }).catch(function (error) {
+                    console.error('Error updating attendance:', error);
+                });
+
+                delete attendanceTimeouts[studentName];
+            }, 500);
+        }
+
+        var gradeAndCommentTimeouts = {};
+
+        function updateGradeAndComment(promo, course, td, studentName, date,sanitizedStudentName) {
+            var grade = document.getElementById('grade-' + sanitizedStudentName).value;
+            var comment = document.getElementById('comment-' + sanitizedStudentName).value;
+            var gradeValue = grade !== '' ? parseFloat(grade) : null;
+
+            if (gradeAndCommentTimeouts[studentName]) {
+                clearTimeout(gradeAndCommentTimeouts[studentName]);
+            }
+
+            gradeAndCommentTimeouts[studentName] = setTimeout(function () {
+                fetch('/students/' + promo + '/' + course + '/' + td + '/' + studentName + '/' + date + '/grade', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        grade: gradeValue,
+                        comment: comment
+                    })
+                }).then(function (response) {
+                }).catch(function (error) {
+                    console.error('Error updating grade and comment:', error);
+                });
+
+                delete gradeAndCommentTimeouts[studentName];
+            }, 500);
+        }
+
+        // Random selection logic
+        function highlightRandomRow() {
+            while (document.querySelectorAll('tbody tr:not(.table-warning)').length > 0) {
+                var rows = document.querySelectorAll('tbody tr');
+
+
+                var randomIndex = Math.floor(Math.random() * rows.length);
+                var selectedRow = rows[randomIndex];
+                if (!selectedRow.classList.contains('table-warning')) {
+                    selectedRow.classList.add('table-warning');
+                    break;
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Sessions for {promo} - {course} - {td} - {date}</h1>
+
+    <!-- Button to highlight random row -->
+    <button class="btn btn-primary mb-3" onclick="highlightRandomRow()">Pick Random Student</button>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Attendance</th>
+            <th>Grade</th>
+            <th>Comment</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over the sessions list -->
+        {#for session in sessions}
+            <tr>
+                <td><a href="/students/{session.student.name}">{session.student.name}</a></td>
+                <td class="attendance-buttons-{session.getSanitizedStudentName()}">
+                    <button id="attendance-PRESENT-{session.getSanitizedStudentName()}"
+                            class="btn {#if session.attendance eq 'PRESENT'}btn-primary{#else}btn-secondary{/if}"
+                            onclick="updateAttendance('{promo}', '{course}', '{td}', '{session.student.name}', '{date}', 'PRESENT','{session.getSanitizedStudentName()}')">
+                        Present
+                    </button>
+                    <button id="attendance-ABSENT-{session.getSanitizedStudentName()}"
+                            class="btn {#if session.attendance eq 'ABSENT'}btn-primary{#else}btn-secondary{/if}"
+                            onclick="updateAttendance('{promo}', '{course}', '{td}', '{session.student.name}', '{date}', 'ABSENT','{session.getSanitizedStudentName()}')">
+                        Absent
+                    </button>
+
+                    <button id="attendance-LATE-{session.getSanitizedStudentName()}"
+                            class="btn {#if session.attendance eq 'LATE'}btn-primary{#else}btn-secondary{/if}"
+                            onclick="updateAttendance('{promo}', '{course}', '{td}', '{session.student.name}', '{date}', 'LATE','{session.getSanitizedStudentName()}')">
+                        Late
+                    </button>
+
+                    <button id="attendance-EXCUSED-{session.getSanitizedStudentName()}"
+                            class="btn {#if session.attendance eq 'EXCUSED'}btn-primary{#else}btn-secondary{/if}"
+                            onclick="updateAttendance('{promo}', '{course}', '{td}', '{session.student.name}', '{date}', 'EXCUSED','{session.getSanitizedStudentName()}')">
+                        Excused
+                    </button>
+                </td>
+                <td>
+                    <input type="number" id="grade-{session.getSanitizedStudentName()}" class="form-control" min="0" max="2" step="0.5"
+                           value="{session.grade == null ? '' : session.grade}"
+                           oninput="updateGradeAndComment('{promo}', '{course}', '{td}', '{session.student.name}', '{date}','{session.getSanitizedStudentName()}')"
+                           placeholder="Enter grade">
+                </td>
+                <td>
+                    <input type="text" id="comment-{session.getSanitizedStudentName()}" class="form-control" value="{session.comment}"
+                           oninput="updateGradeAndComment('{promo}', '{course}', '{td}', '{session.student.name}', '{date}','{session.getSanitizedStudentName()}')"
+                           placeholder="Enter comment">
+                </td>
+            </tr>
+        {/for}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+version: "3"
+
+volumes:
+  lldap_data:
+    driver: local
+
+services:
+  lldap:
+    image: lldap/lldap:stable
+    ports:
+      # For LDAP, not recommended to expose, see Usage section.
+      #- "3890:3890"
+      # For LDAPS (LDAP Over SSL), enable port if LLDAP_LDAPS_OPTIONS__ENABLED set true, look env below
+      #- "6360:6360"
+      # For the web front-end
+      - "17170:17170"
+    volumes:
+      - "lldap_data:/data"
+      # Alternatively, you can mount a local folder
+      # - "./lldap_data:/data"
+    environment:
+      - UID=1000
+      - GID=1000
+      - TZ=Europe/Paris
+      - LLDAP_JWT_SECRET=REPLACE_WITH_RANDOM
+      - LLDAP_KEY_SEED=REPLACE_WITH_RANDOM
+      - LLDAP_LDAP_BASE_DN=dc=example,dc=com
+      # If using LDAPS, set enabled true and configure cert and key path
+      # - LLDAP_LDAPS_OPTIONS__ENABLED=true
+      # - LLDAP_LDAPS_OPTIONS__CERT_FILE=/path/to/certfile.crt
+      # - LLDAP_LDAPS_OPTIONS__KEY_FILE=/path/to/keyfile.key
+      # You can also set a different database:
+      # - LLDAP_DATABASE_URL=mysql://mysql-user:password@mysql-server/my-database
+      # - LLDAP_DATABASE_URL=postgres://postgres-user:password@postgres-server/my-database
