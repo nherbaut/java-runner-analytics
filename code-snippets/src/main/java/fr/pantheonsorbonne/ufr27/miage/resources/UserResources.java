@@ -43,7 +43,7 @@ public class UserResources {
     public TemplateInstance getHome(@Context SecurityContext context) throws Exception {
 
 
-        List<Snippet> snippets = Snippet.find("SELECT s from Snippet s where s.owner=?1", context.getUserPrincipal().getName()).list();
+        List<Snippet> snippets = Snippet.find("SELECT s from Snippet s where s.owner=?1 order by s.lastTouchedTime desc", context.getUserPrincipal().getName()).list();
         return Templates.index(snippets, codeSnippetApiURL);
     }
 

@@ -96,20 +96,19 @@ async function updateSnippet(snippetId, title, files, comments, metas) {
 
 async function createSnippet(title, files, comments, metas) {
 
-    if (metas == undefined) {
+    if (metas === undefined) {
         metas = [];
     }
-    if (comments == undefined) {
+    if (comments === undefined) {
         comments = [];
     }
     var postHeaders = {...headers};
     postHeaders["Content-type"] = "application/json";
 
-    let response = await fetch(codeSnippetAPIURL + "/snippet/",
+    return await fetch(codeSnippetAPIURL + "/snippet/",
         {
             method: 'POST',
             headers: postHeaders,
-
             credentials: 'include',
             mode: 'cors',
             body: JSON.stringify({
@@ -120,7 +119,6 @@ async function createSnippet(title, files, comments, metas) {
             })
 
         });
-    return response;
 }
 
 export {

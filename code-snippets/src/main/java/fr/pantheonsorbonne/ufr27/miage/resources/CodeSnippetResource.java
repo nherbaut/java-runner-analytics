@@ -33,7 +33,7 @@ public class CodeSnippetResource {
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @PermitAll
-    public Collection<Snippet> getAllSnippetsPaged(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("10000") @QueryParam("pageSize") int pageSize) {
+    public Collection<Snippet> getAllSnippetsPaged(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("1000") @QueryParam("pageSize") int pageSize) {
         return Snippet.findAll(Sort.descending("owner").and("lastTouchedTime")).page(pageIndex, pageSize).list();
 
     }
@@ -42,8 +42,8 @@ public class CodeSnippetResource {
     @Produces(MediaType.TEXT_HTML)
     @GET
     @PermitAll
-    public TemplateInstance getAllSnippetsPagedHTML(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("25") @QueryParam("pageSize") int pageSize) {
-        return fr.pantheonsorbonne.ufr27.miage.resources.Templates.index(Snippet.findAll().page(pageIndex, pageSize).list(), codeSnippetApiURL);
+    public TemplateInstance getAllSnippetsPagedHTML(@DefaultValue("0") @QueryParam("pageIndex") int pageIndex, @DefaultValue("1000") @QueryParam("pageSize") int pageSize) {
+        return fr.pantheonsorbonne.ufr27.miage.resources.Templates.index( Snippet.findAll(Sort.descending("lastTouchedTime")).page(pageIndex, pageSize).list(), codeSnippetApiURL);
 
     }
 
@@ -117,7 +117,7 @@ public class CodeSnippetResource {
         snippet.lastTouchedTime = Instant.now();
         Snippet.persist(snippet);
 
-        return Response.created(UriBuilder.fromUri(codeSnippetApiURL).path("snippet").path(snippet.id).build()).build();
+        return Response.created(UriBuilder.fromUri(codeSnippetApiURL).path("snippet").path(snippet.id).build()).entity(snippet.id).build();
     }
 
 

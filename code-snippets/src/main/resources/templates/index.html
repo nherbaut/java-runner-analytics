@@ -18,7 +18,7 @@
     <ul class="list-group" id="snippets">
         {#for snippet in snippets}
             <li class="list-group-item">
-                <a href="/snippet/{snippet.id}">{snippet.title} (by {snippet.owner})</a>
+                <a href="/snippet/{snippet.id}">{snippet.title} (by {snippet.owner}) updated on {snippet.lastTouchedTime}</a>
                 <a href="#" class="fa-solid fa-trash snip-action fa-xl snip-delete" data-id="{snippet.id}"></a>
                 <a href="https://java.miage.dev/?snipId={snippet.id}"
                    class="fa-solid fa-play snip-action fa-xl fa-shake snip-play"></a>

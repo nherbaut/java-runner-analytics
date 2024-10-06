@@ -1,4 +1,4 @@
-k: clean build-push k-refresh k-logs
+k: clean build-push-native k-refresh k-logs
 
 clean:
 	mvn clean
@@ -6,6 +6,9 @@ build:
 	quarkus build -Dquarkus.container-image.build=true
 build-push:
 	quarkus build -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
+
+build-push-native:      
+	./mvnw package -Dnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
 run:
 	quarkus dev
 run-docker:
